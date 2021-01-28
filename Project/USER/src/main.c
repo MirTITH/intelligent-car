@@ -1,6 +1,6 @@
 #include "headfile.h"
-#include "MotorVolt.h"//
-#include "PID_SpeedControl.h"
+#include "MotorVolt.h"//定义了驱动板引脚
+#include "PID_SpeedControl.h"//定义了编码器引脚
 #include <stdlib.h>
 
 // **************************** 宏定义 ****************************
