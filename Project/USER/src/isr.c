@@ -21,6 +21,7 @@
 #include "isr.h"
 
 extern void tim_interrupt_SpeedCount();
+extern void tim_interrupt_TimeCounter();
 
 void TIM1_BRK_UP_TRG_COM_IRQHandler (void)
 {
@@ -39,6 +40,8 @@ void TIM3_IRQHandler (void)
 {
 	uint32 state = TIM3->SR;														// 读取中断状态
 	TIM3->SR &= ~state;																// 清空中断状态
+	PID_Volt_Calc();
+	
 }
 
 void TIM8_BRK_UP_TRG_COM_IRQHandler (void)
@@ -51,12 +54,15 @@ void TIM14_IRQHandler (void)
 {
 	uint32 state = TIM14->SR;														// 读取中断状态
 	TIM14->SR &= ~state;															// 清空中断状态
+	
+	
 }
 
 void TIM16_IRQHandler (void)
 {
 	uint32 state = TIM16->SR;														// 读取中断状态
 	TIM16->SR &= ~state;															// 清空中断状态
+	
 }
 
 void TIM17_IRQHandler (void)
@@ -77,6 +83,7 @@ void UART1_IRQHandler(void)
 	}
 	if(UART1->ISR & UART_ISR_RX_INTF)												// 串口接收缓冲中断
 	{
+		wireless_uart_callback();
 		UART1->ICR |= UART_ICR_RXICLR;												// 清除中断标志位
 	}
 }
