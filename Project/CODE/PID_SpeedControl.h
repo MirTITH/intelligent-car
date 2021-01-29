@@ -1,5 +1,5 @@
-#ifndef _PID_SpeedContril_h_
-#define _PID_SpeedContril_h_
+#ifndef _PID_SpeedControl_h_
+#define _PID_SpeedControl_h_
 
 #define Encoder1_LSB A8
 #define Encoder2_LSB C1

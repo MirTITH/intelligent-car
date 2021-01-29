@@ -5,13 +5,13 @@
 #define SpeedConut_Feq 100
 #define PID_Calc_Feq 100
 
-#define MAX_Motor_Volt (PWM_DUTY_MAX / 5)
-#define MIN_Motor_Volt (-PWM_DUTY_MAX / 5)
+#define MAX_Motor_Volt (PWM_DUTY_MAX / 2)
+#define MIN_Motor_Volt (-PWM_DUTY_MAX / 2)
 
 bool PIDOn = true;
 
-double P_Value = 1000;//比例项
-double D_Value = 5;//微分项
+double P_Value = 2000;//比例项
+double D_Value = 200;//微分项
 
 
 volatile long long encoder1;

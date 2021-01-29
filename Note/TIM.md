@@ -61,7 +61,7 @@ TIM14->CR1 |= TIM_CR1_CEN;
 isr.c
 
 ```c
-extern long long TimeCountPeriod;
+extern unsigned long long TimeCountPeriod;
 void TIM14_IRQHandler (void)
 {
 	uint32 state = TIM14->SR;														// ╤ах║жп╤ов╢л╛

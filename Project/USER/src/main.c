@@ -1,6 +1,7 @@
 #include "headfile.h"
 #include "MotorVolt.h"//定义了驱动板引脚
 #include "PID_SpeedControl.h"//定义了编码器引脚
+#include "Timer_us.h"
 #include <stdlib.h>
 
 // **************************** 宏定义 ****************************
@@ -29,6 +30,8 @@ int IsChariNum(char*);
 int IsCharfNum(char*);
 void GetiValueFromStr(int*, char*, char*);
 void GetfValueFromStr(double*, char*, char*);
+unsigned long long lastT = 0;//上次循环的微秒值
+unsigned long long dt = 0;//循环的间隔（微秒）
 
 
 int main(void)
@@ -38,17 +41,20 @@ int main(void)
 	icm20602_init_spi();
 	MotorVolt_init();
 	PID_SpeedControl_init();
+	Timer_us_init();
 
 	exp_Speed1 = 20;
 	exp_Speed2 = 20;
 
 	while(1)
 	{
+		dt = Timer_us_Get() - lastT;
+		lastT = Timer_us_Get();
 		PrintData();
 		//systick_delay_ms(1);
 		Update_Gyro_Acc();
 
-/* 		if (total_us % 4000000 > 2000000)
+		if (Timer_us_Get() % 5000000 > 2500000)
 		{
 			exp_Speed1 = 50;
 			exp_Speed2 = 50;
@@ -57,7 +63,7 @@ int main(void)
 		{
 			exp_Speed1 = -50;
 			exp_Speed2 = -50;
-		} */
+		}
 
 		GetInfoFromRX();
 	}
@@ -68,7 +74,7 @@ void PrintData()
 {
 	static unsigned int counter = 0;
 	if (counter--) return;
-	counter = 300;
+	counter = 100;
 	//printf("Hello\n");
 	//printf("A1 %d,A8 %d,C0 %d,C1 %d\n",gpio_get(A1), gpio_get(A8), gpio_get(C0), gpio_get(C1));
 	//printf("M2 %lld,M1 %lld", encoder2, encoder1);
@@ -78,8 +84,9 @@ void PrintData()
 	{
 		printf(",eS1 %.2lf,eS2 %.2lf", exp_Speed1, exp_Speed2);
 		printf(",S1 %lld,S2 %lld", delta_encoder1, delta_encoder2);
-		printf(",v1 %lf,v2 %lf", Volt1 / 100, Volt2 / 100);
-		printf(",p %lf,d %lf", P_Value, D_Value);
+		//printf(",v1 %lf,v2 %lf", Volt1 / 100, Volt2 / 100);
+		// printf(",p %lf,d %lf", P_Value, D_Value);
+		// printf(",dt %llu", dt);
 	}else
 	{
 		printf(",p %lf,d %lf", P_Value, D_Value);

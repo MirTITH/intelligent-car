@@ -22,6 +22,7 @@
 
 extern void tim_interrupt_SpeedCount();
 extern void tim_interrupt_TimeCounter();
+extern unsigned long long TimeCountPeriod;
 
 void TIM1_BRK_UP_TRG_COM_IRQHandler (void)
 {
@@ -53,9 +54,9 @@ void TIM8_BRK_UP_TRG_COM_IRQHandler (void)
 void TIM14_IRQHandler (void)
 {
 	uint32 state = TIM14->SR;														// 读取中断状态
+	TimeCountPeriod++;
+	//printf("%llu\n", TimeCountPeriod);
 	TIM14->SR &= ~state;															// 清空中断状态
-	
-	
 }
 
 void TIM16_IRQHandler (void)
