@@ -9,11 +9,13 @@
 
 ### 计时方法
 ``` c
-RCC->APB2ENR?|=?((uint32_t)0x00000001?<<?16);//TIM14?定时器使能
-TIM14->ARR?=?0xffff;//自动重装载值设为65535
-TIM14->PSC?=?0xffff;//预分频值设为65535
-TIM14->CR1?|=?TIM_CR1_CEN;//启动TIM14
+RCC->APB2ENR |= ((uint32_t)0x00000001 << 16);//TIM14 定时器使能
+TIM14->ARR = 0xffff;//自动重装载值设为65535
+TIM14->PSC = 0xffff;//预分频值设为65535
+TIM14->CR1 |= TIM_CR1_CEN;//启动TIM14
 ```
+
+
 
 ### 中断方法
 ``` c
@@ -33,4 +35,42 @@ NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;//启动中断
 NVIC_Init(&NVIC_InitStructure);//中断配置函数
 
 TIM14->CR1 |= TIM_CR1_CEN;//启动TIM14
+```
+
+### 超精准微秒级定时器计时方法
+
+main.c
+
+``` c
+unsigned long long TimeCountPeriod = 0;
+
+RCC->APB2ENR |= ((uint32_t)0x00000001 << 16);//TIM14 定时器使能
+TIM14->ARR = 0xffff;
+TIM14->PSC = 95;
+TIM14->DIER |= TIM_DIER_UI;
+//中断
+NVIC_InitTypeDef NVIC_InitStructure;
+NVIC_InitStructure.NVIC_IRQChannel = TIM14_IRQn;
+NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+NVIC_Init(&NVIC_InitStructure);
+
+TIM14->CR1 |= TIM_CR1_CEN;
+```
+
+isr.c
+
+```c
+extern long long TimeCountPeriod;
+void TIM14_IRQHandler (void)
+{
+	uint32 state = TIM14->SR;														// 读取中断状态
+	TIM14->SR &= ~state;															// 清空中断状态
+	TimeCountPeriod++;
+}
+
+```
+获取时间：
+```c 
+printf("%llu\n", TimeCountPeriod * 65535 + TIM14->CNT);
 ```
