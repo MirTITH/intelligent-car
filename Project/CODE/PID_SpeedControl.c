@@ -8,6 +8,7 @@
 #define MAX_Motor_Volt (PWM_DUTY_MAX / 5)
 #define MIN_Motor_Volt (-PWM_DUTY_MAX / 5)
 
+bool PIDOn = true;
 
 double P_Value = 1000;//比例项
 double D_Value = 5;//微分项
@@ -62,21 +63,25 @@ void PID_SpeedControl_init()
 	gpio_init(Encoder2_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
 	exti_interrupt_init(C0, EXTI_Trigger_Rising_Falling, 0x00);//修改接口后要在isr.h中进行相应修改
 	exti_interrupt_init(A1, EXTI_Trigger_Rising_Falling, 0x00);//修改接口后要在isr.h中进行相应修改
+	PIDOn = true;
 }
 
 //电压计算，需要不断循环执行
 void PID_Volt_Calc()
 {
-	Volt1 += P_Value * E1 / PID_Calc_Feq + D_Value * (E1 - last_E1);
-	Volt2 += P_Value * E2 / PID_Calc_Feq + D_Value * (E2 - last_E2);
+	if (PIDOn)
+	{
+		Volt1 += P_Value * E1 / PID_Calc_Feq + D_Value * (E1 - last_E1);
+		Volt2 += P_Value * E2 / PID_Calc_Feq + D_Value * (E2 - last_E2);
 
-	if (Volt1 > MAX_Motor_Volt) Volt1 = MAX_Motor_Volt;
-	if (Volt1 < MIN_Motor_Volt) Volt1 = MIN_Motor_Volt;
-	if (Volt2 > MAX_Motor_Volt) Volt2 = MAX_Motor_Volt;
-	if (Volt2 < MIN_Motor_Volt) Volt2 = MIN_Motor_Volt;
+		if (Volt1 > MAX_Motor_Volt) Volt1 = MAX_Motor_Volt;
+		if (Volt1 < MIN_Motor_Volt) Volt1 = MIN_Motor_Volt;
+		if (Volt2 > MAX_Motor_Volt) Volt2 = MAX_Motor_Volt;
+		if (Volt2 < MIN_Motor_Volt) Volt2 = MIN_Motor_Volt;
 
-	Motor1_Volt(Volt1);
-	Motor2_Volt(Volt2);
+		Motor1_Volt(Volt1);
+		Motor2_Volt(Volt2);
+	}
 }
 
 void exti_interrupt_encoder_2()
