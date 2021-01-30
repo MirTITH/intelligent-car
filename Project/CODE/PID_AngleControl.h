@@ -4,6 +4,7 @@
 extern bool PID_AngleControl_On;
 extern double angle_yz_err;
 
+const double PI = 3.1415926535897932384626433832795;
 
 void PID_AngleControl_init();
 void Angle_Set();
