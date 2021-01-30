@@ -58,7 +58,7 @@ void tim_interrupt_SpeedCount()
 void PID_SpeedControl_init()
 {
 	tim_interrupt_init(TIM_1, SpeedConut_Feq, 1);//初始化定时器中断
-	tim_interrupt_init(TIM_3, PID_Calc_Feq, 1); //初始化基于TIM_3的中断（用于PID）
+	tim_interrupt_init(TIM_3, PID_Calc_Feq, 2); //初始化基于TIM_3的中断（用于PID）
 	gpio_init(Encoder1_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
 	gpio_init(Encoder2_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
 	exti_interrupt_init(C0, EXTI_Trigger_Rising_Falling, 0x00);//修改接口后要在isr.h中进行相应修改

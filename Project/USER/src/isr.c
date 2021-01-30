@@ -21,8 +21,9 @@
 #include "isr.h"
 
 extern void tim_interrupt_SpeedCount();
-extern void tim_interrupt_TimeCounter();
+extern void PID_Volt_Calc();
 extern unsigned long long TimeCountPeriod;
+
 
 void TIM1_BRK_UP_TRG_COM_IRQHandler (void)
 {
@@ -54,9 +55,8 @@ void TIM8_BRK_UP_TRG_COM_IRQHandler (void)
 void TIM14_IRQHandler (void)
 {
 	uint32 state = TIM14->SR;														// ¶ÁÈ¡ÖÐ¶Ï×´Ì¬
-	TimeCountPeriod++;
-	//printf("%llu\n", TimeCountPeriod);
 	TIM14->SR &= ~state;															// Çå¿ÕÖÐ¶Ï×´Ì¬
+	TimeCountPeriod++;
 }
 
 void TIM16_IRQHandler (void)
