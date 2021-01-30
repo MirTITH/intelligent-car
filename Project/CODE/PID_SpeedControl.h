@@ -15,7 +15,7 @@ void PID_Volt_Calc();
 void exti_interrupt_encoder_2();
 void exti_interrupt_encoder_1();
 
-extern bool PIDOn;
+extern bool PID_SpeedControl_On;
 extern volatile long long encoder1;
 extern volatile long long encoder2;
 extern volatile long long delta_encoder1;

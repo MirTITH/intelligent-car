@@ -22,6 +22,7 @@
 
 extern void tim_interrupt_SpeedCount();
 extern void PID_Volt_Calc();
+extern void PID_AngleControl_Calc();
 extern unsigned long long TimeCountPeriod;
 
 
@@ -63,7 +64,7 @@ void TIM16_IRQHandler (void)
 {
 	uint32 state = TIM16->SR;														// ¶ÁÈ¡ÖÐ¶Ï×´Ì¬
 	TIM16->SR &= ~state;															// Çå¿ÕÖÐ¶Ï×´Ì¬
-	
+	PID_AngleControl_Calc();
 }
 
 void TIM17_IRQHandler (void)

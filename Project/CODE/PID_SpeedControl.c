@@ -3,12 +3,12 @@
 #include "MotorVolt.h"
 
 #define SpeedConut_Feq 100
-#define PID_Calc_Feq 100
+#define PID_SpeedControl_Calc_Feq 1000
 
 #define MAX_Motor_Volt (PWM_DUTY_MAX / 2)
 #define MIN_Motor_Volt (-PWM_DUTY_MAX / 2)
 
-bool PIDOn = true;
+bool PID_SpeedControl_On = false;
 
 double P_Value = 2000;//比例项
 double D_Value = 200;//微分项
@@ -58,21 +58,21 @@ void tim_interrupt_SpeedCount()
 void PID_SpeedControl_init()
 {
 	tim_interrupt_init(TIM_1, SpeedConut_Feq, 1);//初始化定时器中断
-	tim_interrupt_init(TIM_3, PID_Calc_Feq, 2); //初始化基于TIM_3的中断（用于PID）
+	tim_interrupt_init(TIM_3, PID_SpeedControl_Calc_Feq, 2); //初始化基于TIM_3的中断（用于PID）
 	gpio_init(Encoder1_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
 	gpio_init(Encoder2_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
 	exti_interrupt_init(C0, EXTI_Trigger_Rising_Falling, 0x00);//修改接口后要在isr.h中进行相应修改
 	exti_interrupt_init(A1, EXTI_Trigger_Rising_Falling, 0x00);//修改接口后要在isr.h中进行相应修改
-	PIDOn = true;
+	PID_SpeedControl_On = true;
 }
 
 //电压计算，需要不断循环执行
 void PID_Volt_Calc()
 {
-	if (PIDOn)
+	if (PID_SpeedControl_On)
 	{
-		Volt1 += P_Value * E1 / PID_Calc_Feq + D_Value * (E1 - last_E1);
-		Volt2 += P_Value * E2 / PID_Calc_Feq + D_Value * (E2 - last_E2);
+		Volt1 += P_Value * E1 / PID_SpeedControl_Calc_Feq + D_Value * (E1 - last_E1);
+		Volt2 += P_Value * E2 / PID_SpeedControl_Calc_Feq + D_Value * (E2 - last_E2);
 
 		if (Volt1 > MAX_Motor_Volt) Volt1 = MAX_Motor_Volt;
 		if (Volt1 < MIN_Motor_Volt) Volt1 = MIN_Motor_Volt;

@@ -20,6 +20,7 @@
 #ifndef _headfile_h
 #define _headfile_h
 
+const double PI = 3.1415926535897932384626433832795;
 
 #include <stdint.h>
 

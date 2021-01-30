@@ -1,20 +1,17 @@
 #include "headfile.h"
 #include "MotorVolt.h"//定义了驱动板引脚
 #include "PID_SpeedControl.h"//定义了编码器引脚
+#include "PID_AngleControl.h"
 #include "Timer_us.h"
 #include <stdlib.h>
 
 // **************************** 宏定义 ****************************
 
-const double PI = 3.1415926535897932384626433832795;
-
 // **************************** 宏定义 ****************************
 
 // **************************** 变量定义 ****************************
 
-double acc_angle_yz = 0;//y,z轴方向加速度的角度
-const double bal_acc_angle_yz = 0.81;//平衡时的角度
-double angle_yz_err = 0;
+
 
 
 // **************************** 变量定义 ****************************
@@ -22,7 +19,7 @@ double angle_yz_err = 0;
 // **************************** 代码区域 ****************************
 
 void PrintData();
-void Update_Gyro_Acc();
+
 char* getrxs();
 void Clear_rx_buffer();
 void GetInfoFromRX();
@@ -34,6 +31,7 @@ unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
 
 
+
 int main(void)
 {
 	board_init(true);																// 初始化 debug 输出串口
@@ -41,20 +39,21 @@ int main(void)
 	icm20602_init_spi();
 	MotorVolt_init();
 	PID_SpeedControl_init();
+	PID_SpeedControl_init();
 	Timer_us_init();
 
-	exp_Speed1 = 20;
-	exp_Speed2 = 20;
+	exp_Speed1 = 0;
+	exp_Speed2 = 0;
 
 	while(1)
 	{
 		dt = Timer_us_Get() - lastT;
 		lastT = Timer_us_Get();
-		PrintData();
-		//systick_delay_ms(1);
-		Update_Gyro_Acc();
 
-		if (Timer_us_Get() % 5000000 > 2500000)
+		PrintData();
+		//systick_delay_ms(10);
+		
+/* 		if (Timer_us_Get() % 5000000 > 2500000)
 		{
 			exp_Speed1 = 50;
 			exp_Speed2 = 50;
@@ -64,11 +63,10 @@ int main(void)
 			exp_Speed1 = -50;
 			exp_Speed2 = -50;
 		}
-
+ */
 		GetInfoFromRX();
 	}
 }
-
 
 void PrintData()
 {
@@ -78,12 +76,14 @@ void PrintData()
 	//printf("Hello\n");
 	//printf("A1 %d,A8 %d,C0 %d,C1 %d\n",gpio_get(A1), gpio_get(A8), gpio_get(C0), gpio_get(C1));
 	//printf("M2 %lld,M1 %lld", encoder2, encoder1);
-	//printf("rx %d,ry %d,rz %d,ax %d,ay %d,az %d\n",icm_gyro_x, icm_gyro_y, icm_gyro_z, icm_acc_x, icm_acc_y, icm_acc_z);
-	//printf("%lf\n", angle_yz_err);
-	if (PIDOn)
+	// printf("wx %d,wy %d,wz %d",icm_gyro_x, icm_gyro_y, icm_gyro_z);
+	// printf(",ax %d,ay %d,az %d", icm_acc_x, icm_acc_y, icm_acc_z);
+	// printf(",rx %lld,ry %lld,rz %lld", rx, ry, rz);
+	printf(",Eyz %lf\n", angle_yz_err);
+	if (PID_SpeedControl_On)
 	{
-		printf(",eS1 %.2lf,eS2 %.2lf", exp_Speed1, exp_Speed2);
-		printf(",S1 %lld,S2 %lld", delta_encoder1, delta_encoder2);
+		// printf(",eS1 %.2lf,eS2 %.2lf", exp_Speed1, exp_Speed2);
+		// printf(",S1 %lld,S2 %lld", delta_encoder1, delta_encoder2);
 		//printf(",v1 %lf,v2 %lf", Volt1 / 100, Volt2 / 100);
 		// printf(",p %lf,d %lf", P_Value, D_Value);
 		// printf(",dt %llu", dt);
@@ -93,7 +93,7 @@ void PrintData()
 	}
 	
 
-	// printf("%d", PIDOn);
+	// printf("%d", PID_SpeedControl_On);
 	//printf(",dt %u\n", dt);
 /* 	for (int i = 0; i < WIRELESS_BUFFER_SIZE; i++)
 	{
@@ -110,23 +110,6 @@ void PrintData()
 	//printf("%s", getrxs());
 
 	printf("\n");
-}
-
-//更新加速度、角度值
-void Update_Gyro_Acc()
-{
-		get_icm20602_gyro_spi();
-		get_icm20602_accdata_spi();
-
-		if (icm_acc_z != 0)
-		{
-			acc_angle_yz = atan((double)icm_acc_y / icm_acc_z);
-		}
-		else
-		{
-			acc_angle_yz = PI / 2;
-		}
-		angle_yz_err = bal_acc_angle_yz - acc_angle_yz;
 }
 
 //获取串口接收到的字符串（以'\0'或'\r'或'\n'结尾）
@@ -205,9 +188,15 @@ void GetInfoFromRX()
 
 	if (strchr(str, '\'') != NULL) 
 	{
-		PIDOn = false;
+		PID_SpeedControl_On = false;
 		Motor1_Volt(0);
 		Motor2_Volt(0);
+		return;
+	}
+
+	if (strchr(str, '$') != NULL) 
+	{
+		PID_SpeedControl_On = true;
 		return;
 	}
 
@@ -233,7 +222,6 @@ int IsCharfNum(char* cha)
 {
 	return ((*cha >= '0' && *cha <= '9') || *cha == '-' || *cha == '+' || *cha == '.');
 }
-
 
 /*
 从str（长度为WIRELESS_BUFFER_SIZE）中寻找subStr后面的整数并将num_set设为该整数
