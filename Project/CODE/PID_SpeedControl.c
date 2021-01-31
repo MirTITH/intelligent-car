@@ -10,8 +10,8 @@
 
 bool PID_SpeedControl_On = false;
 
-double P_Value = 2000;//比例项
-double D_Value = 200;//微分项
+double P_Value = 2500;//比例项
+double D_Value = 6;//微分项
 
 
 volatile long long encoder1;
@@ -23,8 +23,8 @@ volatile long long encoder2_last = 0;
 volatile long long delta_encoder1 = 0;
 volatile long long delta_encoder2 = 0;
 
-double exp_Speed1 = 0;
-double exp_Speed2 = 0;
+double exp_Speed1 = 0;//电机1的期望速度
+double exp_Speed2 = 0;//电机2的期望速度
 
 double Volt1 = 0;
 double Volt2 = 0;

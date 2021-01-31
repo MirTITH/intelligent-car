@@ -7,9 +7,6 @@
 void tim_interrupt_SpeedCount();
 void PID_SpeedControl_init();
 
-void Motor1_Speed();
-void Motor2_Speed();
-
 void PID_Volt_Calc();
 
 void exti_interrupt_encoder_2();

@@ -39,11 +39,8 @@ int main(void)
 	icm20602_init_spi();
 	MotorVolt_init();
 	PID_SpeedControl_init();
-	PID_SpeedControl_init();
+	PID_AngleControl_init();
 	Timer_us_init();
-
-	exp_Speed1 = 0;
-	exp_Speed2 = 0;
 
 	while(1)
 	{
@@ -79,17 +76,23 @@ void PrintData()
 	// printf("wx %d,wy %d,wz %d",icm_gyro_x, icm_gyro_y, icm_gyro_z);
 	// printf(",ax %d,ay %d,az %d", icm_acc_x, icm_acc_y, icm_acc_z);
 	// printf(",rx %lld,ry %lld,rz %lld", rx, ry, rz);
-	printf(",Eyz %lf\n", angle_yz_err);
 	if (PID_SpeedControl_On)
 	{
-		// printf(",eS1 %.2lf,eS2 %.2lf", exp_Speed1, exp_Speed2);
-		// printf(",S1 %lld,S2 %lld", delta_encoder1, delta_encoder2);
+		printf("es1,s1,s2,E\n");
+		printf("%.2lf", exp_Speed1);
+		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
+		printf(",%lf", angle_yz_err);
 		//printf(",v1 %lf,v2 %lf", Volt1 / 100, Volt2 / 100);
 		// printf(",p %lf,d %lf", P_Value, D_Value);
 		// printf(",dt %llu", dt);
 	}else
 	{
-		printf(",p %lf,d %lf", P_Value, D_Value);
+		//printf("p,d,ap,ai,ad\n");
+		printf("p %lf,d %lf", P_Value, D_Value);
+		printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
+		printf(",ab %lf", bal_acc_angle_yz);
+		printf(",E %lf", angle_yz_err);
+
 	}
 	
 
@@ -189,14 +192,17 @@ void GetInfoFromRX()
 	if (strchr(str, '\'') != NULL) 
 	{
 		PID_SpeedControl_On = false;
+		PID_AngleControl_On = false;
 		Motor1_Volt(0);
 		Motor2_Volt(0);
+		I_Value = 0;
 		return;
 	}
 
 	if (strchr(str, '$') != NULL) 
 	{
 		PID_SpeedControl_On = true;
+		PID_AngleControl_On = true;
 		return;
 	}
 
@@ -206,9 +212,16 @@ void GetInfoFromRX()
 	GetfValueFromStr(&exp_Speed1, str, "s=");
 	GetfValueFromStr(&exp_Speed2, str, "s=");
 
-	//获取P_Value
-	GetfValueFromStr(&P_Value, str, "p=");
-	GetfValueFromStr(&D_Value, str, "d=");
+	//获取PID_SpeedControl的参数
+	GetfValueFromStr(&P_Value, str, "sp=");
+	GetfValueFromStr(&D_Value, str, "sd=");
+
+	//获取PID_AngleControl的参数
+	GetfValueFromStr(&AngleControl_P, str, "ap=");
+	GetfValueFromStr(&AngleControl_I, str, "ai=");
+	GetfValueFromStr(&AngleControl_D, str, "ad=");
+	GetfValueFromStr(&bal_acc_angle_yz, str, "ab=");
+
 }
 
 //判断字符是否属于整数或正负号
