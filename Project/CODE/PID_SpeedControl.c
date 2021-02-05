@@ -10,8 +10,9 @@
 
 bool PID_SpeedControl_On = false;
 
-double P_Value = 2500;//比例项
-double D_Value = 6;//微分项
+double PID_SC_Kp = 0;//比例系数
+double PID_SC_Ki = 2500;//积分系数
+double PID_SC_Kd = 6;//微分系数
 
 
 volatile long long encoder1;
@@ -71,8 +72,21 @@ void PID_Volt_Calc()
 {
 	if (PID_SpeedControl_On)
 	{
-		Volt1 += P_Value * E1 / PID_SpeedControl_Calc_Feq + D_Value * (E1 - last_E1);
-		Volt2 += P_Value * E2 / PID_SpeedControl_Calc_Feq + D_Value * (E2 - last_E2);
+		static double I_Value1 = 0;//电机1积分项的值
+		static double I_Value2 = 0;//电机2积分项的值
+		if (PID_SC_Ki == 0)
+		{
+			I_Value1 = 0;
+			I_Value2 = 0;
+		}else
+		{
+			I_Value1 += PID_SC_Ki * E1 / PID_SpeedControl_Calc_Feq;
+			I_Value2 += PID_SC_Ki * E2 / PID_SpeedControl_Calc_Feq;
+		}
+		
+		
+		Volt1 = PID_SC_Kp * E1 + I_Value1 + PID_SC_Kd * (E1 - last_E1);
+		Volt2 = PID_SC_Kp * E2 + I_Value2 + PID_SC_Kd * (E2 - last_E2);
 
 		if (Volt1 > MAX_Motor_Volt) Volt1 = MAX_Motor_Volt;
 		if (Volt1 < MIN_Motor_Volt) Volt1 = MIN_Motor_Volt;

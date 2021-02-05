@@ -10,7 +10,7 @@ extern double AngleControl_P;
 extern double AngleControl_I;
 extern double AngleControl_D;
 
-extern double I_Value;
+extern double PID_AC_I_Value;
 
 void PID_AngleControl_init();
 void Angle_Set();

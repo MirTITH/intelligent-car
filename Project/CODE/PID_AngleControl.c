@@ -2,7 +2,7 @@
 #include "PID_SpeedControl.h"
 #include "PID_AngleControl.h"
 
-#define PID_AngleControl_Calc_Feq 100
+#define PID_AngleControl_Calc_Feq 1000
 
 const double PI = 3.1415926535897932384626433832795;
 
@@ -12,10 +12,10 @@ double bal_acc_angle_yz = 0.823;//平衡时的角度
 double angle_yz_err = 0;
 
 double AngleControl_P = 350;
-double AngleControl_I = 1000;
+double AngleControl_I = 0;
 double AngleControl_D = 0;
 
-double I_Value = 0;
+double PID_AC_I_Value = 0;
 
 
 double Motor_AngleControl_Speed = 0;
@@ -33,8 +33,8 @@ void PID_AngleControl_Calc()
 	Update_Gyro_Acc();
 	if (PID_AngleControl_On)
 	{
-		I_Value += AngleControl_I * angle_yz_err / PID_AngleControl_Calc_Feq;
-		Motor_AngleControl_Speed = AngleControl_P * angle_yz_err + I_Value;
+		PID_AC_I_Value += AngleControl_I * angle_yz_err / PID_AngleControl_Calc_Feq;
+		Motor_AngleControl_Speed = AngleControl_P * angle_yz_err + PID_AC_I_Value;
 		exp_Speed1 = Motor_AngleControl_Speed;
 		exp_Speed2 = Motor_AngleControl_Speed;
 	}

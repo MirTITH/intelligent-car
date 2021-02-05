@@ -69,7 +69,7 @@ void PrintData()
 {
 	static unsigned int counter = 0;
 	if (counter--) return;
-	counter = 100;
+	counter = 30;
 	//printf("Hello\n");
 	//printf("A1 %d,A8 %d,C0 %d,C1 %d\n",gpio_get(A1), gpio_get(A8), gpio_get(C0), gpio_get(C1));
 	//printf("M2 %lld,M1 %lld", encoder2, encoder1);
@@ -79,16 +79,17 @@ void PrintData()
 	if (PID_SpeedControl_On)
 	{
 		printf("es1,s1,s2,E\n");
+		// printf("es1,E\n");
 		printf("%.2lf", exp_Speed1);
 		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
-		printf(",%lf", angle_yz_err);
+		// printf(",%lf", angle_yz_err);
 		//printf(",v1 %lf,v2 %lf", Volt1 / 100, Volt2 / 100);
-		// printf(",p %lf,d %lf", P_Value, D_Value);
+		// printf(",p %lf,d %lf", PID_SC_Kp, PID_SC_Kd);
 		// printf(",dt %llu", dt);
 	}else
 	{
 		//printf("p,d,ap,ai,ad\n");
-		printf("p %lf,d %lf", P_Value, D_Value);
+		printf("p %lf,i %lf,d %lf", PID_SC_Kp, PID_SC_Ki, PID_SC_Kd);
 		printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
 		printf(",ab %lf", bal_acc_angle_yz);
 		printf(",E %lf", angle_yz_err);
@@ -195,7 +196,7 @@ void GetInfoFromRX()
 		PID_AngleControl_On = false;
 		Motor1_Volt(0);
 		Motor2_Volt(0);
-		I_Value = 0;
+		PID_AC_I_Value = 0;
 		return;
 	}
 
@@ -206,15 +207,16 @@ void GetInfoFromRX()
 		return;
 	}
 
-	GetfValueFromStr(&exp_Speed1, str, "s1=");
-	GetfValueFromStr(&exp_Speed2, str, "s2=");
+	GetfValueFromStr(&exp_Speed1, str, "es1=");
+	GetfValueFromStr(&exp_Speed2, str, "es2=");
 
-	GetfValueFromStr(&exp_Speed1, str, "s=");
-	GetfValueFromStr(&exp_Speed2, str, "s=");
+	GetfValueFromStr(&exp_Speed1, str, "es=");
+	GetfValueFromStr(&exp_Speed2, str, "es=");
 
 	//获取PID_SpeedControl的参数
-	GetfValueFromStr(&P_Value, str, "sp=");
-	GetfValueFromStr(&D_Value, str, "sd=");
+	GetfValueFromStr(&PID_SC_Kp, str, "sp=");
+	GetfValueFromStr(&PID_SC_Ki, str, "si=");
+	GetfValueFromStr(&PID_SC_Kd, str, "sd=");
 
 	//获取PID_AngleControl的参数
 	GetfValueFromStr(&AngleControl_P, str, "ap=");

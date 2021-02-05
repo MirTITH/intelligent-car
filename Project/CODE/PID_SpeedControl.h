@@ -21,7 +21,8 @@ extern double exp_Speed1;
 extern double exp_Speed2;
 extern double Volt1;
 extern double Volt2;
-extern double P_Value;
-extern double D_Value;
+extern double PID_SC_Kp;
+extern double PID_SC_Ki;
+extern double PID_SC_Kd;
 
 #endif
