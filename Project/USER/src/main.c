@@ -12,8 +12,6 @@
 // **************************** 变量定义 ****************************
 
 
-
-
 // **************************** 变量定义 ****************************
 
 // **************************** 代码区域 ****************************
@@ -69,20 +67,23 @@ void PrintData()
 {
 	static unsigned int counter = 0;
 	if (counter--) return;
-	counter = 30;
+	counter = 40;
 	//printf("Hello\n");
 	//printf("A1 %d,A8 %d,C0 %d,C1 %d\n",gpio_get(A1), gpio_get(A8), gpio_get(C0), gpio_get(C1));
 	//printf("M2 %lld,M1 %lld", encoder2, encoder1);
-	// printf("wx %d,wy %d,wz %d",icm_gyro_x, icm_gyro_y, icm_gyro_z);
+	// printf("wx %d",icm_gyro_x);
 	// printf(",ax %d,ay %d,az %d", icm_acc_x, icm_acc_y, icm_acc_z);
 	// printf(",rx %lld,ry %lld,rz %lld", rx, ry, rz);
 	if (PID_SpeedControl_On)
 	{
-		printf("es1,s1,s2,E\n");
-		// printf("es1,E\n");
+		printf("E,s1,s2,Cs,Dab\n");
+		// printf("Hubu,a\n");
 		printf("%.2lf", exp_Speed1);
 		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
-		// printf(",%lf", angle_yz_err);
+		printf(",%lf", speed_car);
+		// printf(",%lf", angle_yz_err * 10);
+		printf(",%lf", 10 * bal_acc_angle_yz - 8.3);
+		// printf(",%lf", (bal_acc_angle_yz - acc_angle_yz) * 10);
 		//printf(",v1 %lf,v2 %lf", Volt1 / 100, Volt2 / 100);
 		// printf(",p %lf,d %lf", PID_SC_Kp, PID_SC_Kd);
 		// printf(",dt %llu", dt);
@@ -93,6 +94,9 @@ void PrintData()
 		printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
 		printf(",ab %lf", bal_acc_angle_yz);
 		printf(",E %lf", angle_yz_err);
+		printf(",cp %lf,cd %lf", AC_CarSpeed_P, AC_CarSpeed_D);
+		// printf(",ar %lf, gr %e", acc_ratio, gyro_ratio);
+
 
 	}
 	
@@ -224,6 +228,15 @@ void GetInfoFromRX()
 	GetfValueFromStr(&AngleControl_D, str, "ad=");
 	GetfValueFromStr(&bal_acc_angle_yz, str, "ab=");
 
+	GetfValueFromStr(&acc_ratio, str, "ar=");
+	GetfValueFromStr(&gyro_ratio, str, "gr=");
+
+	GetfValueFromStr(&AC_CarSpeed_P, str, "cp=");
+	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
+	GetfValueFromStr(&speed_car, str, "s=");
+
+
+
 }
 
 //判断字符是否属于整数或正负号
@@ -294,5 +307,6 @@ void GetfValueFromStr(double* num_set, char* str, char* subStr)
 		*num_set = atof(str_num);
 	}
 }
+
 
 // **************************** 代码区域 ****************************

@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"*.c": "c",
+		"pid_anglecontrol.h": "c"
+	}
+}

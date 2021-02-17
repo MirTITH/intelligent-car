@@ -10,9 +10,9 @@
 
 bool PID_SpeedControl_On = false;
 
-double PID_SC_Kp = 0;//比例系数
+double PID_SC_Kp = 350;//比例系数
 double PID_SC_Ki = 2500;//积分系数
-double PID_SC_Kd = 6;//微分系数
+double PID_SC_Kd = 100;//微分系数
 
 
 volatile long long encoder1;
