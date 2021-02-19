@@ -10,9 +10,9 @@
 
 bool PID_SpeedControl_On = false;
 
-double PID_SC_Kp = 350;//比例系数
+double PID_SC_Kp = 500;//比例系数
 double PID_SC_Ki = 2500;//积分系数
-double PID_SC_Kd = 100;//微分系数
+double PID_SC_Kd = 0;//微分系数
 
 
 volatile long long encoder1;
@@ -27,8 +27,8 @@ volatile long long delta_encoder2 = 0;
 double exp_Speed1 = 0;//电机1的期望速度
 double exp_Speed2 = 0;//电机2的期望速度
 
-double Volt1 = 0;
-double Volt2 = 0;
+int Volt1 = 0;
+int Volt2 = 0;
 
 volatile double last_E1 = 0;
 volatile double last_E2 = 0;
@@ -74,6 +74,9 @@ void PID_Volt_Calc()
 	{
 		static double I_Value1 = 0;//电机1积分项的值
 		static double I_Value2 = 0;//电机2积分项的值
+
+		static double last_exp_Speed1 = 0;
+		static double last_exp_Speed2 = 0;
 		if (PID_SC_Ki == 0)
 		{
 			I_Value1 = 0;
@@ -85,8 +88,11 @@ void PID_Volt_Calc()
 		}
 		
 		
-		Volt1 = PID_SC_Kp * E1 + I_Value1 + PID_SC_Kd * (E1 - last_E1);
-		Volt2 = PID_SC_Kp * E2 + I_Value2 + PID_SC_Kd * (E2 - last_E2);
+		Volt1 = PID_SC_Kp * E1 + I_Value1 + PID_SC_Kd * (exp_Speed1 - last_exp_Speed1);
+		Volt2 = PID_SC_Kp * E2 + I_Value2 + PID_SC_Kd * (exp_Speed2 - last_exp_Speed2);
+
+		last_exp_Speed1 = exp_Speed1;
+		last_exp_Speed2 = exp_Speed2;
 
 		if (Volt1 > MAX_Motor_Volt) Volt1 = MAX_Motor_Volt;
 		if (Volt1 < MIN_Motor_Volt) Volt1 = MIN_Motor_Volt;

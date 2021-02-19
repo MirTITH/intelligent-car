@@ -19,11 +19,12 @@ extern double acc_ratio;
 extern double gyro_ratio;
 
 extern double speed_car;
+extern double turnRatio;
 // extern double acc_angle_yz;
 
 void PID_AngleControl_init();
-void Angle_Set();
 void PID_AngleControl_Calc();
+//void PID_balAngle_Calc();
 void Update_Gyro_Acc();
 double angle_calc(angle_m, gyro_m);
 

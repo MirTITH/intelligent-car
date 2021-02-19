@@ -2,9 +2,9 @@
 #include "PID_SpeedControl.h"
 #include "PID_AngleControl.h"
 
-#define PID_AngleControl_Calc_Feq 1000
-#define MAX_bal_acc_angle_yz 0.91
-#define MIN_bal_acc_angle_yz 0.75
+#define PID_AngleControl_Calc_Feq 250
+#define MAX_bal_acc_angle_yz 0.93
+#define MIN_bal_acc_angle_yz 0.73
 
 const double PI = 3.1415926535897932384626433832795;
 
@@ -13,16 +13,17 @@ double acc_angle_yz = 0;//y,z轴方向加速度的角度
 double bal_acc_angle_yz = 0.83;//平衡时的角度
 double angle_yz_err = 0;
 
-double AngleControl_P = 500;
-double AngleControl_I = 500;
+double AngleControl_P = 300;
+double AngleControl_I = 1000;
 double AngleControl_D = 0;//暂未使用
 
-double AC_CarSpeed_P = 0;
-double AC_CarSpeed_D = 0;
+double AC_CarSpeed_P = 0.0007; //平衡角度控制比例项
+double AC_CarSpeed_D = 0.001; //平衡角度控制微分项
 
 double PID_AC_I_Value = 0;
 
 double speed_car = 0;//期望车速
+double turnRatio = 0; //转弯系数（左转弯为正）
 
 
 double Motor_AngleControl_Speed = 0;
@@ -36,6 +37,7 @@ double gyro_ratio = 0.001;    //陀螺仪比例
 
 void PID_AngleControl_init()
 {
+	systick_delay_ms(100);
 	tim_interrupt_init(TIM_16, PID_AngleControl_Calc_Feq, 2);
 	PID_AngleControl_On = true;
 }
@@ -49,10 +51,10 @@ void PID_AngleControl_Calc()
 	{
 		PID_AC_I_Value += AngleControl_I * angle_yz_err / PID_AngleControl_Calc_Feq;
 		Motor_AngleControl_Speed = AngleControl_P * angle_yz_err + PID_AC_I_Value;
-		exp_Speed1 = Motor_AngleControl_Speed;
-		exp_Speed2 = Motor_AngleControl_Speed;
+		exp_Speed1 = Motor_AngleControl_Speed * (1 - turnRatio);
+		exp_Speed2 = Motor_AngleControl_Speed * (1 + turnRatio);
 
-		sE = exp_Speed1 - speed_car;
+		sE = Motor_AngleControl_Speed - speed_car;
 		bal_acc_angle_yz += sE * AC_CarSpeed_P / PID_AngleControl_Calc_Feq + (sE - last_sE) * AC_CarSpeed_D;
 		if (bal_acc_angle_yz > MAX_bal_acc_angle_yz) bal_acc_angle_yz = MAX_bal_acc_angle_yz;
 		if (bal_acc_angle_yz < MIN_bal_acc_angle_yz) bal_acc_angle_yz = MIN_bal_acc_angle_yz;
@@ -98,7 +100,7 @@ double angle_calc(double angle_m, double gyro_m)
 
 	// static double last_angle_m;    
 
-    static uint8 first_angle;    
+    static bool first_angle;    
 
         
 
@@ -108,7 +110,7 @@ double angle_calc(double angle_m, double gyro_m)
 
         //如果是第一次运行，则将上次角度值设置为与加速度值一致    
 
-        first_angle = 1;    
+        first_angle = true;    
 
         last_angle = angle_m;    
 

@@ -1,6 +1,7 @@
 {
 	"files.associations": {
 		"*.c": "c",
-		"pid_anglecontrol.h": "c"
+		"pid_anglecontrol.h": "c",
+		"timer_us.h": "c"
 	}
 }
