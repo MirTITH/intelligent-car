@@ -45,20 +45,9 @@ int main(void)
 		dt = Timer_us_Get() - lastT;
 		lastT = Timer_us_Get();
 
-		PrintData();
+		//PrintData();
 		//systick_delay_ms(10);
 		
-/* 		if (Timer_us_Get() % 5000000 > 2500000)
-		{
-			exp_Speed1 = 50;
-			exp_Speed2 = 50;
-		}
-		else
-		{
-			exp_Speed1 = -50;
-			exp_Speed2 = -50;
-		}
- */
 		GetInfoFromRX();
 	}
 }
@@ -124,10 +113,21 @@ void PrintData()
 //获取串口接收到的字符串（以'\0'或'\r'或'\n'结尾）
 char* getrxs()
 {
-	if (!(wireless_rx_buffer[wireless_rx_index - 1] == '\r' || wireless_rx_buffer[wireless_rx_index - 1] == '\n' || wireless_rx_buffer[wireless_rx_index - 1] == '\0'))
+	if (wireless_rx_index == 0)
 	{
-		return NULL;
+		if (!(wireless_rx_buffer[WIRELESS_BUFFER_SIZE - 1] == '\r' || wireless_rx_buffer[WIRELESS_BUFFER_SIZE - 1] == '\n' || wireless_rx_buffer[WIRELESS_BUFFER_SIZE - 1] == '\0'))
+		{
+			return NULL;
+		}
 	}
+	else
+	{
+		if (!(wireless_rx_buffer[wireless_rx_index - 1] == '\r' || wireless_rx_buffer[wireless_rx_index - 1] == '\n' || wireless_rx_buffer[wireless_rx_index - 1] == '\0'))
+		{
+			return NULL;
+		}
+	}
+	
 	int buffer_cursor = wireless_rx_index;
 	bool circulate_flag = false;
 	static char result[WIRELESS_BUFFER_SIZE + 1] = {0};
@@ -195,6 +195,11 @@ void GetInfoFromRX()
 		return;
 	}
 
+	if (str[0] == '\r' || str[0] == '\n' || str[0] == '\0')
+	{
+		return;
+	}
+
 	if (strchr(str, '\'') != NULL) 
 	{
 		PID_SpeedControl_On = false;
@@ -238,7 +243,7 @@ void GetInfoFromRX()
 	GetfValueFromStr(&turnRatio, str, "r=");
 
 
-
+	printf("%s", str);
 
 }
 
