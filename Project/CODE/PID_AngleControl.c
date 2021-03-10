@@ -11,20 +11,20 @@ const double PI = 3.1415926535897932384626433832795;
 bool PID_AngleControl_On = false;
 double acc_angle_yz = 0;//y,z轴方向加速度的角度
 double bal_acc_angle_yz = 0.83;//平衡时的角度
+//double last_angle_yz_err;
 double angle_yz_err = 0;
 
 double AngleControl_P = 300;
 double AngleControl_I = 1000;
-double AngleControl_D = 0;//暂未使用
+double AngleControl_D = 0;
 
-double AC_CarSpeed_P = 0.0007; //平衡角度控制比例项
-double AC_CarSpeed_D = 0.001; //平衡角度控制微分项
+double AC_CarSpeed_P = 0.0007;
+double AC_CarSpeed_D = 0.001;
 
-double PID_AC_I_Value = 0;
+double PID_AC_I_Value = 0;//积分项的值
 
-double speed_car = 0;//期望车速
-double turnRatio = 0; //转弯系数（左转弯为正）
-
+double car_speed = 0;
+double turnRatio = 0; 
 
 double Motor_AngleControl_Speed = 0;
 //double Motor2_AngleControl_Speed = 0;
@@ -46,7 +46,7 @@ void PID_AngleControl_Calc()
 {
 	Update_Gyro_Acc();
 	static double last_sE = 0;
-	static double sE = 0;
+	static double sE = 0;//当前车速与期望车速的差
 	if (PID_AngleControl_On)
 	{
 		PID_AC_I_Value += AngleControl_I * angle_yz_err / PID_AngleControl_Calc_Feq;
@@ -54,7 +54,7 @@ void PID_AngleControl_Calc()
 		exp_Speed1 = Motor_AngleControl_Speed * (1 - turnRatio);
 		exp_Speed2 = Motor_AngleControl_Speed * (1 + turnRatio);
 
-		sE = Motor_AngleControl_Speed - speed_car;
+		sE = Motor_AngleControl_Speed - car_speed;
 		bal_acc_angle_yz += sE * AC_CarSpeed_P / PID_AngleControl_Calc_Feq + (sE - last_sE) * AC_CarSpeed_D;
 		if (bal_acc_angle_yz > MAX_bal_acc_angle_yz) bal_acc_angle_yz = MAX_bal_acc_angle_yz;
 		if (bal_acc_angle_yz < MIN_bal_acc_angle_yz) bal_acc_angle_yz = MIN_bal_acc_angle_yz;
@@ -81,6 +81,7 @@ void Update_Gyro_Acc()
 		{
 			acc_angle_yz = PI / 2;
 		}
+		//last_angle_yz_err = angle_yz_err;
 		angle_yz_err = bal_acc_angle_yz - angle_calc(acc_angle_yz, (double)icm_gyro_x);
 }
 

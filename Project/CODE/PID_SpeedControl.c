@@ -5,37 +5,36 @@
 #define SpeedConut_Feq 100
 #define PID_SpeedControl_Calc_Feq 1000
 
-#define MAX_Motor_Volt (PWM_DUTY_MAX / 2)
-#define MIN_Motor_Volt (-PWM_DUTY_MAX / 2)
+#define MAX_Motor_Volt (PWM_DUTY_MAX)
+#define MIN_Motor_Volt (-PWM_DUTY_MAX)
 
 bool PID_SpeedControl_On = false;
 
-double PID_SC_Kp = 500;//比例系数
-double PID_SC_Ki = 2500;//积分系数
-double PID_SC_Kd = 0;//微分系数
+double PID_SC_Kp = 500;
+double PID_SC_Ki = 2500;
+double PID_SC_Kd = 0;
 
 
-volatile long long encoder1;
-volatile long long encoder2;
+long long encoder1;
+long long encoder2;
 
-volatile long long encoder1_last = 0;
-volatile long long encoder2_last = 0;
+long long encoder1_last = 0;
+long long encoder2_last = 0;
 
-volatile long long delta_encoder1 = 0;
-volatile long long delta_encoder2 = 0;
+long long delta_encoder1 = 0;
+long long delta_encoder2 = 0;
 
-double exp_Speed1 = 0;//电机1的期望速度
-double exp_Speed2 = 0;//电机2的期望速度
+double exp_Speed1 = 0;
+double exp_Speed2 = 0;
 
 int Volt1 = 0;
 int Volt2 = 0;
 
-volatile double last_E1 = 0;
-volatile double last_E2 = 0;
-volatile double E1 = 0;
-volatile double E2 = 0;
+double last_E1 = 0;
+double last_E2 = 0;
+double E1 = 0;
+double E2 = 0;
 
-//编码器测速函数，顺便再计算偏差的导数
 void tim_interrupt_SpeedCount()
 {
 	delta_encoder1 = encoder1 - encoder1_last;
@@ -49,13 +48,6 @@ void tim_interrupt_SpeedCount()
 	E2 = exp_Speed2 - delta_encoder2;
 }
 
-/* 
-初始化PID速度控制
-初始化Encoder1_LSB、Encoder2_LSB的gpio
-使用C0、A1外部中断读取编码器
-使用TIM_1配置中断测速
-使用TIM_3用于电机电压PID控制
-*/
 void PID_SpeedControl_init()
 {
 	tim_interrupt_init(TIM_1, SpeedConut_Feq, 1);//初始化定时器中断
@@ -67,7 +59,6 @@ void PID_SpeedControl_init()
 	PID_SpeedControl_On = true;
 }
 
-//电压计算，需要不断循环执行
 void PID_Volt_Calc()
 {
 	if (PID_SpeedControl_On)
@@ -75,8 +66,8 @@ void PID_Volt_Calc()
 		static double I_Value1 = 0;//电机1积分项的值
 		static double I_Value2 = 0;//电机2积分项的值
 
-		static double last_exp_Speed1 = 0;
-		static double last_exp_Speed2 = 0;
+		// static double last_exp_Speed1 = 0;
+		// static double last_exp_Speed2 = 0;
 		if (PID_SC_Ki == 0)
 		{
 			I_Value1 = 0;
@@ -87,12 +78,15 @@ void PID_Volt_Calc()
 			I_Value2 += PID_SC_Ki * E2 / PID_SpeedControl_Calc_Feq;
 		}
 		
-		
+/* 		
 		Volt1 = PID_SC_Kp * E1 + I_Value1 + PID_SC_Kd * (exp_Speed1 - last_exp_Speed1);
 		Volt2 = PID_SC_Kp * E2 + I_Value2 + PID_SC_Kd * (exp_Speed2 - last_exp_Speed2);
 
 		last_exp_Speed1 = exp_Speed1;
 		last_exp_Speed2 = exp_Speed2;
+ */
+		Volt1 = PID_SC_Kp * E1 + I_Value1;
+		Volt2 = PID_SC_Kp * E2 + I_Value2;
 
 		if (Volt1 > MAX_Motor_Volt) Volt1 = MAX_Motor_Volt;
 		if (Volt1 < MIN_Motor_Volt) Volt1 = MIN_Motor_Volt;

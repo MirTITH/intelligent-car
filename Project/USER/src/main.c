@@ -1,4 +1,5 @@
 #include "headfile.h"
+#include "MySerial.h"
 #include "MotorVolt.h"//定义了驱动板引脚
 #include "PID_SpeedControl.h"//定义了编码器引脚
 #include "PID_AngleControl.h"
@@ -17,14 +18,9 @@
 // **************************** 代码区域 ****************************
 
 void PrintData();
-
-char* getrxs();
-void Clear_rx_buffer();
 void GetInfoFromRX();
-int IsChariNum(char*);
-int IsCharfNum(char*);
-void GetiValueFromStr(int*, char*, char*);
-void GetfValueFromStr(double*, char*, char*);
+
+
 unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
 
@@ -45,8 +41,8 @@ int main(void)
 		dt = Timer_us_Get() - lastT;
 		lastT = Timer_us_Get();
 
-		//PrintData();
-		//systick_delay_ms(10);
+		PrintData();
+		systick_delay_ms(10);
 		
 		GetInfoFromRX();
 	}
@@ -70,7 +66,7 @@ void PrintData()
 		printf("%.2lf", exp_Speed1);
 		printf(",%.2lf", exp_Speed2);
 		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
-		// printf(",%lf", speed_car);
+		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
 		printf(",%lf", 10 * bal_acc_angle_yz);
 		// printf(",%lf", (bal_acc_angle_yz - acc_angle_yz) * 10);
@@ -110,83 +106,6 @@ void PrintData()
 	printf("\n");
 }
 
-//获取串口接收到的字符串（以'\0'或'\r'或'\n'结尾）
-char* getrxs()
-{
-	if (wireless_rx_index == 0)
-	{
-		if (!(wireless_rx_buffer[WIRELESS_BUFFER_SIZE - 1] == '\r' || wireless_rx_buffer[WIRELESS_BUFFER_SIZE - 1] == '\n' || wireless_rx_buffer[WIRELESS_BUFFER_SIZE - 1] == '\0'))
-		{
-			return NULL;
-		}
-	}
-	else
-	{
-		if (!(wireless_rx_buffer[wireless_rx_index - 1] == '\r' || wireless_rx_buffer[wireless_rx_index - 1] == '\n' || wireless_rx_buffer[wireless_rx_index - 1] == '\0'))
-		{
-			return NULL;
-		}
-	}
-	
-	int buffer_cursor = wireless_rx_index;
-	bool circulate_flag = false;
-	static char result[WIRELESS_BUFFER_SIZE + 1] = {0};
-	buffer_cursor -= 2;
-	if (buffer_cursor < 0)
-	{
-		buffer_cursor += WIRELESS_BUFFER_SIZE;
-	}
-
-	while (!(wireless_rx_buffer[buffer_cursor] == '\r' || wireless_rx_buffer[buffer_cursor] == '\0' || wireless_rx_buffer[buffer_cursor] == '\n'))
-	{
-		buffer_cursor--;
-
-		if (buffer_cursor < 0)
-		{
-			if (circulate_flag == true)
-			{
-				return NULL;
-			}
-			circulate_flag = true;
-			buffer_cursor += WIRELESS_BUFFER_SIZE;
-		}
-	}
-
-	for (int i = 0; i <= WIRELESS_BUFFER_SIZE; i++)
-	{
-		buffer_cursor++;
-		if (buffer_cursor >= WIRELESS_BUFFER_SIZE)
-		{
-			buffer_cursor -= WIRELESS_BUFFER_SIZE;
-		}
-
-		if (buffer_cursor == wireless_rx_index)
-		{
-			result[i] = '\0';
-			break;
-		}
-		result[i] = wireless_rx_buffer[buffer_cursor];
-	}
-
-	Clear_rx_buffer();
-	return result;
-}
-
-//清除串口接收缓冲区
-void Clear_rx_buffer()
-{
-	if (wireless_rx_index - 2 < 0)
-	{
-		wireless_rx_buffer[WIRELESS_BUFFER_SIZE + wireless_rx_index - 2] = '\0';
-	}
-	else
-	{
-		wireless_rx_buffer[wireless_rx_index - 2] = '\0';
-	}
-	
-}
-
-//从串口获取exp_Speed
 void GetInfoFromRX()
 {
 	char* str = getrxs();
@@ -239,82 +158,12 @@ void GetInfoFromRX()
 
 	GetfValueFromStr(&AC_CarSpeed_P, str, "cp=");
 	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
-	GetfValueFromStr(&speed_car, str, "s=");
+	GetfValueFromStr(&car_speed, str, "s=");
 	GetfValueFromStr(&turnRatio, str, "r=");
 
 
-	printf("%s", str);
+	//printf("%s", str);
 
 }
-
-//判断字符是否属于整数或正负号
-int IsChariNum(char* cha)
-{
-	return ((*cha >= '0' && *cha <= '9') || *cha == '-' || *cha == '+');
-}
-
-//判断字符是否属于浮点数或正负号
-int IsCharfNum(char* cha)
-{
-	return ((*cha >= '0' && *cha <= '9') || *cha == '-' || *cha == '+' || *cha == '.');
-}
-
-/*
-从str（长度为WIRELESS_BUFFER_SIZE）中寻找subStr后面的整数并将num_set设为该整数
-*/
-void GetiValueFromStr(int* num_set, char* str, char* subStr)
-{
-	int num_end = 0;
-	char* str_pointer = 0;
-	char str_num[WIRELESS_BUFFER_SIZE] = {0};
-
-	str_pointer = strstr(str, subStr);
-	if (str_pointer != NULL)
-	{
-		str_pointer += strlen(subStr);
-		num_end = 0;
-		while (IsChariNum(str_pointer + num_end))
-		{
-			num_end++;
-		}
-
-		for (int i = 0; i < num_end; i++)
-		{
-			str_num[i] = str_pointer[i];
-		}
-		str_num[num_end] = '\0';
-		*num_set = atoi(str_num);
-	}
-}
-
-/*
-从str（长度为WIRELESS_BUFFER_SIZE）中寻找subStr后面的浮点数并将num_set设为该浮点数
-*/
-void GetfValueFromStr(double* num_set, char* str, char* subStr)
-{
-	int num_end = 0;
-	char* str_pointer = 0;
-	char str_num[WIRELESS_BUFFER_SIZE] = {0};
-
-	str_pointer = strstr(str, subStr);
-	if (str_pointer != NULL)
-	{
-		str_pointer += strlen(subStr);
-		num_end = 0;
-		while (IsCharfNum(str_pointer + num_end))
-		{
-			num_end++;
-		}
-
-		for (int i = 0; i < num_end; i++)
-		{
-			str_num[i] = str_pointer[i];
-		}
-		str_num[num_end] = '\0';
-
-		*num_set = atof(str_num);
-	}
-}
-
 
 // **************************** 代码区域 ****************************

@@ -1,7 +1,6 @@
 #include "headfile.h"
 #include "MotorVolt.h"
 
-//初始化电机驱动接口
 void MotorVolt_init()
 {
 	gpio_init(DIR1, GPO, GPIO_LOW, GPO_PUSH_PUL);
@@ -11,7 +10,7 @@ void MotorVolt_init()
 
 }
 
-//设置电机1的电压，最大值为PWM_DUTY_MAX(50000)
+
 void Motor1_Volt(int duty)
 {
 	if (duty > 0)
@@ -36,7 +35,7 @@ void Motor1_Volt(int duty)
 	}
 }
 
-//设置电机2的电压，最大值为PWM_DUTY_MAX(50000)
+
 void Motor2_Volt(int duty)
 {
 	if (duty > 0)

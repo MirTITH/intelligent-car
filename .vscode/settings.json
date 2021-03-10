@@ -2,6 +2,9 @@
 	"files.associations": {
 		"*.c": "c",
 		"pid_anglecontrol.h": "c",
-		"timer_us.h": "c"
+		"timer_us.h": "c",
+		"headfile.h": "c",
+		"myserial.h": "c",
+		"motorvolt.h": "c"
 	}
 }
