@@ -13,7 +13,7 @@ extern double AngleControl_P;
 //角度姿态PID控制积分系数
 extern double AngleControl_I;
 
-//角度姿态PID控制微分系数（暂未使用）
+//角度姿态PID控制微分系数
 extern double AngleControl_D;
 
 extern double AC_CarSpeed_P; //期望角度控制比例项

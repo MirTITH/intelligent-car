@@ -52,7 +52,7 @@ void PrintData()
 {
 	static unsigned int counter = 0;
 	if (counter--) return;
-	counter = 10;
+	counter = 1;
 	//printf("Hello\n");
 	//printf("A1 %d,A8 %d,C0 %d,C1 %d\n",gpio_get(A1), gpio_get(A8), gpio_get(C0), gpio_get(C1));
 	//printf("M2 %lld,M1 %lld", encoder2, encoder1);
@@ -61,16 +61,17 @@ void PrintData()
 	// printf(",rx %lld,ry %lld,rz %lld", rx, ry, rz);
 	if (PID_SpeedControl_On)
 	{
-		printf("E1,E2,s1,s2,Dab\n");
+		printf("es1,es2,s1,s2,v1,v2\n");
 		// printf("Hubu,a\n");
 		printf("%.2lf", exp_Speed1);
 		printf(",%.2lf", exp_Speed2);
 		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
 		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
-		printf(",%lf", 10 * bal_acc_angle_yz);
+		// printf(",%lf", 10 * bal_acc_angle_yz);
 		// printf(",%lf", (bal_acc_angle_yz - acc_angle_yz) * 10);
-		//printf(",v1 %d,v2 %d", Volt1 / 100, Volt2 / 100);
+		printf(",%d,%d", Volt1 / 100, Volt2 / 100);
+		// printf(",%.2lf", PID_AC_D_Value);
 		// printf(",p %lf,d %lf", PID_SC_Kp, PID_SC_Kd);
 		// printf(",dt %llu", dt);
 	}else

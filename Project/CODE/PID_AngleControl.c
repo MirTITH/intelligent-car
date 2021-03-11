@@ -2,26 +2,32 @@
 #include "PID_SpeedControl.h"
 #include "PID_AngleControl.h"
 
-#define PID_AngleControl_Calc_Feq 250
-#define MAX_bal_acc_angle_yz 0.93
-#define MIN_bal_acc_angle_yz 0.73
+#define PID_AngleControl_Calc_Feq 200
+#define MAX_bal_acc_angle_yz 1.00
+#define MIN_bal_acc_angle_yz 0.60
 
 const double PI = 3.1415926535897932384626433832795;
 
 bool PID_AngleControl_On = false;
 double acc_angle_yz = 0;//y,z轴方向加速度的角度
 double bal_acc_angle_yz = 0.83;//平衡时的角度
-//double last_angle_yz_err;
+double last_angle_yz_err;
 double angle_yz_err = 0;
+
+// double AngleControl_P = 300;
+// double AngleControl_I = 1000;
+// double AngleControl_D = 0;
 
 double AngleControl_P = 300;
 double AngleControl_I = 1000;
-double AngleControl_D = 0;
+double AngleControl_D = 3;
 
-double AC_CarSpeed_P = 0.0007;
+double AC_CarSpeed_P = 0.0013;
 double AC_CarSpeed_D = 0.001;
 
 double PID_AC_I_Value = 0;//积分项的值
+double PID_AC_D_Value = 0;//微分项的值
+double Max_PID_AC_D_Value = 100;
 
 double car_speed = 0;
 double turnRatio = 0; 
@@ -37,7 +43,7 @@ double gyro_ratio = 0.001;    //陀螺仪比例
 
 void PID_AngleControl_init()
 {
-	systick_delay_ms(100);
+	systick_delay_ms(300);
 	tim_interrupt_init(TIM_16, PID_AngleControl_Calc_Feq, 2);
 	PID_AngleControl_On = true;
 }
@@ -50,7 +56,12 @@ void PID_AngleControl_Calc()
 	if (PID_AngleControl_On)
 	{
 		PID_AC_I_Value += AngleControl_I * angle_yz_err / PID_AngleControl_Calc_Feq;
-		Motor_AngleControl_Speed = AngleControl_P * angle_yz_err + PID_AC_I_Value;
+		PID_AC_D_Value = (angle_yz_err - last_angle_yz_err) * PID_AngleControl_Calc_Feq * AngleControl_D;
+
+		if (PID_AC_D_Value > Max_PID_AC_D_Value) PID_AC_D_Value = Max_PID_AC_D_Value;
+		if (PID_AC_D_Value < -Max_PID_AC_D_Value) PID_AC_D_Value = -Max_PID_AC_D_Value;
+
+		Motor_AngleControl_Speed = AngleControl_P * angle_yz_err + PID_AC_I_Value + PID_AC_D_Value;
 		exp_Speed1 = Motor_AngleControl_Speed * (1 - turnRatio);
 		exp_Speed2 = Motor_AngleControl_Speed * (1 + turnRatio);
 
@@ -81,7 +92,7 @@ void Update_Gyro_Acc()
 		{
 			acc_angle_yz = PI / 2;
 		}
-		//last_angle_yz_err = angle_yz_err;
+		last_angle_yz_err = angle_yz_err;
 		angle_yz_err = bal_acc_angle_yz - angle_calc(acc_angle_yz, (double)icm_gyro_x);
 }
 
@@ -138,3 +149,4 @@ double angle_calc(double angle_m, double gyro_m)
     return last_angle;    
 
 }
+

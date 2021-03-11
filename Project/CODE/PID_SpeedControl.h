@@ -34,6 +34,9 @@ extern double exp_Speed2;//电机2的期望速度，要改变电机转速只需修改此值即可
 extern int Volt1;//电机1的电压，最大值为PWM_DUTY_MAX(50000)
 extern int Volt2;//电机2的电压，最大值为PWM_DUTY_MAX(50000)
 
+extern double Max_PID_AC_D_Value;//微分项的限制
+extern double PID_AC_D_Value;//微分项的值
+
 //电机PID转速控制比例系数
 extern double PID_SC_Kp;
 

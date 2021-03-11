@@ -10,8 +10,8 @@
 
 bool PID_SpeedControl_On = false;
 
-double PID_SC_Kp = 500;
-double PID_SC_Ki = 2500;
+double PID_SC_Kp = 400;
+double PID_SC_Ki = 2000;
 double PID_SC_Kd = 0;
 
 
@@ -37,8 +37,8 @@ double E2 = 0;
 
 void tim_interrupt_SpeedCount()
 {
-	delta_encoder1 = encoder1 - encoder1_last;
-	delta_encoder2 = encoder2 - encoder2_last;
+	delta_encoder1 = (encoder1 - encoder1_last) * 100 / SpeedConut_Feq;
+	delta_encoder2 = (encoder2 - encoder2_last) * 100 / SpeedConut_Feq;
 	encoder1_last = encoder1;
 	encoder2_last = encoder2;
 
