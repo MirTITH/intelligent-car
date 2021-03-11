@@ -229,7 +229,7 @@ void icm20602_init_spi(void)
 
 	spi_init(SPI_NUM, SPI_SCK_PIN, SPI_MOSI_PIN, SPI_MISO_PIN, SPI_NSS_NULL, 0, SystemCoreClock/4);	// Ó²¼þSPI³õÊ¼»¯
 
-	gpio_init(SPI_CS_PIN, GPO, GPIO_LOW, GPO_PUSH_PUL);
+	gpio_init(SPI_CS_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
 
 	icm20602_self3_check();//¼ì²â
 

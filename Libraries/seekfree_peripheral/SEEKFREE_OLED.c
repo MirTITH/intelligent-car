@@ -126,11 +126,11 @@ static void oled_hexascii(uint16 hex,int8 * Print)
 //-------------------------------------------------------------------------------------------------------------------
 void oled_init(void)
 {
-	gpio_init(OLED_SCL_PIN, GPO, GPIO_HIGH, GPO_PUSH_PUL);
-	gpio_init(OLED_SDA_PIN, GPO, GPIO_LOW , GPO_PUSH_PUL);
-	gpio_init(OLED_RST_PIN, GPO, GPIO_HIGH, GPO_PUSH_PUL);
-	gpio_init(OLED_DC_PIN , GPO, GPIO_HIGH, GPO_PUSH_PUL);
-	gpio_init(OLED_CS_PIN , GPO, GPIO_HIGH, GPO_PUSH_PUL);
+	gpio_init(OLED_SCL_PIN, GPO, GPIO_HIGH, GPO_PUSH_PULL);
+	gpio_init(OLED_SDA_PIN, GPO, GPIO_LOW , GPO_PUSH_PULL);
+	gpio_init(OLED_RST_PIN, GPO, GPIO_HIGH, GPO_PUSH_PULL);
+	gpio_init(OLED_DC_PIN , GPO, GPIO_HIGH, GPO_PUSH_PULL);
+	gpio_init(OLED_CS_PIN , GPO, GPIO_HIGH, GPO_PUSH_PULL);
 
 	OLED_SCL(1);
 	OLED_RST(0);

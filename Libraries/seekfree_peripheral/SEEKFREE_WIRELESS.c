@@ -58,7 +58,7 @@ void wireless_uart_callback()
 void seekfree_wireless_init (void)
 {
 	//本函数使用的波特率为115200，为无线转串口模块的默认波特率，如需其他波特率请自行配置模块并修改串口的波特率
-	gpio_init(RTS_PIN, GPI, GPIO_LOW, GPI_FLOATING_IN);									// 初始化流控引脚
+	gpio_init(RTS_PIN, GPI, GPIO_LOW, GPI_PULL_UP);										// 初始化流控引脚
 
 	uart_init (WIRELESS_UART, WIRELESS_UART_BAUD, WIRELESS_UART_TX, WIRELESS_UART_RX);	// 初始化串口
 	uart_rx_irq(WIRELESS_UART, ENABLE);

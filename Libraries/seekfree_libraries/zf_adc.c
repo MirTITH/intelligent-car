@@ -21,6 +21,7 @@
 #include "zf_gpio.h"
 
 ADC_TypeDef *adc_index[2] = {ADC1, ADC2};
+uint8 adc_resolution[2] = {ADC_12BIT, ADC_12BIT};
 
 //-------------------------------------------------------------------------------------------------------------------
 // @brief		ADC 引脚初始化 内部调用
@@ -41,7 +42,7 @@ static void adc_pin_init (ADCCH_enum ch)
 // @param		ch				选择ADC通道
 // @param		resolution		选择选择通道分辨率(如果同一个模块初始化时设置了不同的分辨率 则第一个初始化的分辨率生效)
 // @return		void
-// Sample usage:				adc_init(ADC_CH0_A00,ADC_8BIT);//初始化A00为ADC功能 分辨率为8位
+// Sample usage:				adc_init(ADC_1, ADC1_CH00_A00, ADC_8BIT);						//初始化A00为ADC功能 分辨率为8位
 //-------------------------------------------------------------------------------------------------------------------
 void adc_init (ADCN_enum adc, ADCCH_enum ch, ADCRES_enum resolution)
 {
@@ -53,6 +54,8 @@ void adc_init (ADCN_enum adc, ADCCH_enum ch, ADCRES_enum resolution)
 		RCC->APB2RSTR |= (RCC_APB2RSTR_ADC1 << adc);											// 复位 ADC 外设
 		RCC->APB2RSTR &= ~(RCC_APB2RSTR_ADC1 << adc);											// 复位 结束
 
+		adc_resolution[adc] = resolution;														// 记录ADC精度 将在采集时使用 详细请查看 UM <12.5.1 可编程分辨率> 章节
+		adc_index[adc]->ADCFG |= ((uint32)resolution << ADC_CFGR_RSLTCTL_Pos);					// ADC 精度修改
 		adc_index[adc]->ADCFG |= ADC_CFGR_PRE_8;												// ADC 时钟 8 分频
 		adc_index[adc]->ADCR &= ~(ADC_CR_MODE | ADC_CR_ALIGN);									// 清空设置 默认单次转换 数据左对齐
 		adc_index[adc]->ADCR |= ADC_CR_SCAN;													// 单周期转换
@@ -65,7 +68,7 @@ void adc_init (ADCN_enum adc, ADCCH_enum ch, ADCRES_enum resolution)
 // @brief		ADC转换一次
 // @param		ch				选择ADC通道
 // @return		uint16			转换的ADC值
-// Sample usage:				adc_convert(ADC_CH0_A00);
+// Sample usage:				adc_convert(ADC_1, ADC1_CH00_A00);
 //-------------------------------------------------------------------------------------------------------------------
 uint16 adc_convert (ADCN_enum adc, ADCCH_enum ch)
 {
@@ -73,7 +76,7 @@ uint16 adc_convert (ADCN_enum adc, ADCCH_enum ch)
 	adc_index[adc]->ADCR |= ADC_CR_ADST;														// 开始数据转换
 	while(((adc_index[adc]->ADSTA ) & ADC_SR_ADIF) == 0);										// 等待数据转换完成
 	adc_index[adc]->ADSTA |= ADC_SR_ADIF;														// 清除转换完成标志
-	return (adc_index[adc]->ADDATA & 0xfff);													// 读取数据
+	return ((adc_index[adc]->ADDATA & 0xfff) >> adc_resolution[adc]);							// 读取数据 为什么这里要位移请查看 UM <12.5.1 可编程分辨率> 章节
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -81,12 +84,12 @@ uint16 adc_convert (ADCN_enum adc, ADCCH_enum ch)
 // @param		ch				选择ADC通道
 // @param		count			均值滤波次数
 // @return		uint16			转换的ADC值
-// Sample usage:				adc_convert(ADC_CH0_A00,5);//采集5次 然后返回平均值
+// Sample usage:				adc_convert(ADC_1, ADC1_CH00_A00, 5);//采集5次 然后返回平均值
 //-------------------------------------------------------------------------------------------------------------------
 uint16 adc_mean_filter (ADCN_enum adc, ADCCH_enum ch, uint8 count)
 {
 	uint8 i;
-	uint16 sum;
+	uint32 sum;
 
 	sum = 0;
 	for(i=0; i<count; i++)

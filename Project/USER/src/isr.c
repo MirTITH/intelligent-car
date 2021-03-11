@@ -164,6 +164,9 @@ void EXTI4_15_IRQHandler(void)
 	{
 		switch(camera_type)															// 查询摄像头类型 未初始化摄像头则此处会进入default
 		{
+			case CAMERA_BIN:														// 小钻风
+				ov7725_vsync();
+				break;
 			case CAMERA_BIN_UART:  													// 串口小钻风
 				ov7725_uart_vsync();
 				break;
@@ -237,6 +240,9 @@ void DMA1_Channel4_5_IRQHandler(void)
 		DMA_ClearFlag(DMA1_FLAG_TC4);												// 清空该通道中断标志
 		switch(camera_type)															// 查询摄像头类型 未初始化摄像头则此处会进入default
 		{
+			case CAMERA_BIN:														// 小钻风
+				ov7725_dma();
+				break;
 			case CAMERA_BIN_UART:  													// 串口小钻风
 				ov7725_uart_dma();
 				break;

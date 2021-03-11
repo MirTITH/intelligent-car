@@ -62,6 +62,32 @@ void tim_interrupt_init (TIM_enum tim, uint32 freq, uint8 priority)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
+// @brief		TIM 中断初始化 us级别中断
+// @param		tim				选择中断使用的 TIM
+// @param		timer			设置时长 同个模块只有最后一次设置生效
+// @param		priority		选择该中断优先级 范围 [0-3]
+// @return		void
+// Sample usage:				tim_interrupt_init(TIM_1, 1, 0x00);
+//-------------------------------------------------------------------------------------------------------------------
+void tim_interrupt_init_us (TIM_enum tim, uint32 timer, uint8 priority)
+{
+	tim_interrupt_init(tim, 1000000/timer, priority);
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+// @brief		TIM 中断初始化 ms级别中断
+// @param		tim				选择中断使用的 TIM
+// @param		timer			设置时长 同个模块只有最后一次设置生效
+// @param		priority		选择该中断优先级 范围 [0-3]
+// @return		void
+// Sample usage:				tim_interrupt_init(TIM_1, 1, 0x00);
+//-------------------------------------------------------------------------------------------------------------------
+void tim_interrupt_init_ms (TIM_enum tim, uint32 timer, uint8 priority)
+{
+	tim_interrupt_init(tim, 1000/timer, priority);
+}
+
+//-------------------------------------------------------------------------------------------------------------------
 // @brief		TIM 中断使能
 // @param		tim				选择 TIM
 // @return		void

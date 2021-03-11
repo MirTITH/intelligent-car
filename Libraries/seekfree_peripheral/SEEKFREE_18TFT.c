@@ -163,10 +163,10 @@ void lcd_init(void)
 {
 	spi_init(TFT_SPIN, TFT_SCL, TFT_SDA, SPI_MISO_NULL, SPI_NSS_NULL, 0, SystemCoreClock/2);//Ó²¼þSPI³õÊ¼»¯
 
-	gpio_init(TFT_CS_PIN, GPO, GPIO_LOW, GPO_PUSH_PUL);
-	gpio_init(TFT_REST_PIN, GPO, GPIO_LOW, GPO_PUSH_PUL);
-	gpio_init(TFT_DC_PIN, GPO, GPIO_LOW, GPO_PUSH_PUL);
-	gpio_init(TFT_BL_PIN, GPO, GPIO_HIGH, GPO_PUSH_PUL);
+	gpio_init(TFT_CS_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
+	gpio_init(TFT_REST_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
+	gpio_init(TFT_DC_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
+	gpio_init(TFT_BL_PIN, GPO, GPIO_HIGH, GPO_PUSH_PULL);
 
 	TFT_REST(0);
 	systick_delay_ms(10);

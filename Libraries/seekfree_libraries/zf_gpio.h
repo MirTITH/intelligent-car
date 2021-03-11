@@ -36,7 +36,7 @@ typedef enum																					// 枚举端口方向
 	GPI_PULL_DOWN		= 0x08,																	// 定义管脚下拉输入
 	GPI_PULL_UP			= 0x08,																	// 定义管脚上拉输入
 
-	GPO_PUSH_PUL		= 0x00,																	// 定义管脚推挽输出
+	GPO_PUSH_PULL		= 0x00,																	// 定义管脚推挽输出
 	GPO_OPEN_DTAIN		= 0x04,																	// 定义管脚开漏输出
 	GPO_AF_PUSH_PUL		= 0x08,																	// 定义管脚复用推挽输出
 	GPO_AF_OPEN_DTAIN	= 0x0C,																	// 定义管脚复用开漏输出
@@ -56,8 +56,8 @@ typedef enum																					// 枚举端口电平
 
 typedef enum																					// 枚举端口电平
 {
-	GPIO_LOW = 0,																				// 定义管脚输入方向
-	GPIO_HIGH = 1,																				// 定义管脚输出方向
+	GPIO_LOW = 0,																				// 定义管脚默认电平
+	GPIO_HIGH = 1,																				// 定义管脚默认电平
 }GPIOLEVEL_enum;
 
 #define GPIO_PIN_RESET(x)	gpio_group[(x>>4)]->BRR  |= ((uint16_t)0x0001 << (x & 0x0F))		//GPIO复位

@@ -42,8 +42,8 @@ void ccd_init(void)
 	uint8 temp;
 	for(temp = 0; temp<CCD_NUM; temp++)
 		adc_init(AD_GROUP, ccd_adc_ch[temp], AD_RESOLUTION);
-	gpio_init(CCD_CLK_PIN, GPO, GPIO_LOW, GPO_PUSH_PUL);
-	gpio_init(CCD_SI_PIN, GPO, GPIO_LOW, GPO_PUSH_PUL);
+	gpio_init(CCD_CLK_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
+	gpio_init(CCD_SI_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
 	tim_interrupt_init(PIT_TIMER_CH, 1000/EXPOSURE_TIME, 3);
 }
 

@@ -50,8 +50,8 @@
 #define OV7725_SDA1()			GPIO_PIN_SET(OV7725_SDA_PIN)						// IO口输出高电平
 #define OV7725_SCL0()			GPIO_PIN_RESET(OV7725_SCL_PIN)						// IO口输出低电平
 #define OV7725_SCL1()			GPIO_PIN_SET(OV7725_SCL_PIN)						// IO口输出高电平
-#define OV7725_DIR_OUT()		gpio_dir(OV7725_SDA_PIN, GPO, GPO_PUSH_PUL)			// 输出方向
-#define OV7725_DIR_IN()			gpio_dir(OV7725_SDA_PIN, GPI, GPI_FLOATING_IN)		// 输入方向
+#define OV7725_DIR_OUT()		gpio_dir(OV7725_SDA_PIN, GPO, GPO_PUSH_PULL)		// 输出方向
+#define OV7725_DIR_IN()			gpio_dir(OV7725_SDA_PIN, GPI, GPI_PULL_UP)			// 输入方向
 
 #define OV7725_ACK				1													// 主应答
 #define OV7725_NACK				0													// 从应答

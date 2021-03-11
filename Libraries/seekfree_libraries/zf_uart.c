@@ -33,7 +33,7 @@ IRQn_Type uart_irq[2] = {UART1_IRQn, UART2_IRQn};
 static void uart_pin_init (UARTPIN_enum tx_pin, UARTPIN_enum rx_pin)
 {
 	afio_init((PIN_enum)(tx_pin &0xff), GPO, (GPIOAF_enum)((tx_pin &0xf00)>>8), GPO_AF_PUSH_PUL);// 提取对应IO索引 AF功能编码
-	afio_init((PIN_enum)(rx_pin &0xff), GPI, (GPIOAF_enum)((rx_pin &0xf00)>>8), GPI_FLOATING_IN);// 提取对应IO索引 AF功能编码
+	afio_init((PIN_enum)(rx_pin &0xff), GPI, (GPIOAF_enum)((rx_pin &0xf00)>>8), GPI_PULL_UP);	// 提取对应IO索引 AF功能编码
 }
 
 //-------------------------------------------------------------------------------------------------------------------

@@ -61,13 +61,11 @@
 //#define SYSCLK_FREQ_48MHz  (HSE_VALUE*6)      //48000000 based HSE_VALUE = 8000000
 //#define SYSCLK_FREQ_XXMHz  48000000
 #define SYSCLK_FREQ_XXMHz  96000000
-//#define SYSCLK_FREQ_XXMHz 144000000
 //#define SYSCLK_HSI_24MHz  24000000
 //#define SYSCLK_HSI_36MHz  36000000
 //#define SYSCLK_HSI_48MHz  48000000
 //#define SYSCLK_HSI_XXMHz  48000000
 //#define SYSCLK_HSI_XXMHz  96000000
-//#define SYSCLK_HSI_XXMHz  144000000
 /// Uncomment the following line if you need to relocate your vector Table in
 /// Internal SRAM.
 ///#define VECT_TAB_SRAM

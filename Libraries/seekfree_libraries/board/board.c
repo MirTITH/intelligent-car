@@ -29,5 +29,7 @@
 void board_init (bool debug_enable)
 {
 	if(debug_enable)
-		uart_init(UART_1, 115200, UART1_TX_A09, UART1_RX_A10);						// 默认初始化 UART1 用以支持 printf 输出
+	{
+		uart_init(DEBUG_UART, DEBUG_UART_BAUD, DEBUG_UART_TX, DEBUG_UART_RX);					// 默认初始化 UART1 用以支持 printf 输出
+	}
 }

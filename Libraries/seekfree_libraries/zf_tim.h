@@ -100,4 +100,8 @@ void	tim_encoder_init			(TIM_enum tim, TIM_ENC_PIN_enum PULSEA_pin, TIM_ENC_PIN_
 void	tim_encoder_rst				(TIM_enum tim);
 int16	tim_encoder_get_count		(TIM_enum tim);
 
+void	tim_counter_init			(TIM_enum tim, TIM_ENC_PIN_enum input_pin);
+void	tim_counter_rst				(TIM_enum tim);
+int16	tim_counter_get_count		(TIM_enum tim);
+
 #endif

@@ -26,11 +26,11 @@ uint8 *camera_buffer_addr;
 
 //-------------------------------------------------------------------------------------------------------------------
 // @brief		中断初始化
-// @param		irqn			中断号，可以查看reg_common.h文件中的IRQn_Type枚举体定义
-// @param		priority		抢占优先级值越小，优先级越高
+// @param		irqn			中断号 可以查看reg_common.h文件中的IRQn_Type枚举体定义
+// @param		priority		抢占优先级值越小 优先级越高
 // @param		status			使能或者失能
 // @return		void
-// Sample usage:				nvic_init(EXTI0_IRQn, 0, ENABLE); //外部中断0使能,抢占优先级最高，次优先级最高。
+// Sample usage:				nvic_init(EXTI0_1_IRQn, 0, ENABLE);		//外部中断0使能,抢占优先级最高，次优先级最高。
 //-------------------------------------------------------------------------------------------------------------------
 void nvic_init(IRQn_Type irqn, uint8 priority, FunctionalState status)
 {
@@ -42,11 +42,21 @@ void nvic_init(IRQn_Type irqn, uint8 priority, FunctionalState status)
 	NVIC_Init(&NVIC_InitStructure);
 }
 
+//-------------------------------------------------------------------------------------------------------------------
+// @brief		全局中断使能
+// @return		void
+// Sample usage:				nvic_interrput_enable();
+//-------------------------------------------------------------------------------------------------------------------
 void nvic_interrput_enable (void)
 {
 	__ASM volatile("cpsie i");
 }
 
+//-------------------------------------------------------------------------------------------------------------------
+// @brief		全局中断失能
+// @return		void
+// Sample usage:				nvic_interrput_disable();
+//-------------------------------------------------------------------------------------------------------------------
 void nvic_interrput_disable (void)
 {
 	__ASM volatile("cpsid i");

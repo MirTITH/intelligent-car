@@ -211,9 +211,9 @@ uint16 ov7725_get_version(UARTN_enum uartn)
 //-------------------------------------------------------------------------------------------------------------------
 void ov7725_uart_exti_init(void)
 {   
-	gpio_init(OV7725_UART_VSYNC_PIN, GPI, GPIO_LOW, GPI_FLOATING_IN);
+	gpio_init(OV7725_UART_VSYNC_PIN, GPI, GPIO_LOW, GPI_PULL_UP);
 	exti_interrupt_init(OV7725_UART_VSYNC_PIN, EXTI_Trigger_Rising, 0x00);
-	nvic_init(OV7725_UART_VSYNC_IRQN, 2, ENABLE);
+	nvic_init(OV7725_UART_VSYNC_IRQN, 0, ENABLE);
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -240,14 +240,14 @@ void ov7725_uart_dma_init(void)
 	uint8 num;
 	for(num=0; num<8; num++)
 	{
-		gpio_init((PIN_enum)(OV7725_UART_DATA_PIN + num), GPI, GPIO_LOW, GPI_FLOATING_IN);
+		gpio_init((PIN_enum)(OV7725_UART_DATA_PIN + num), GPI, GPIO_LOW, GPI_PULL_UP);
 	}
 
 	//DMA1总线初始化
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 	//DMA摄像头初始化
 	camera_dma_init(OV7725_UART_DMA_CH,(uint32)OV7725_UART_DATA_ADD, (uint32)camera_buffer_addr, OV7725_UART_SIZE);
-	nvic_init(OV7725_UART_DMA_IRQN, 0, ENABLE);								// 中断配置
+	nvic_init(OV7725_UART_DMA_IRQN, 1, ENABLE);								// 中断配置
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -263,7 +263,7 @@ uint8 ov7725_uart_init(void)
 	camera_type = CAMERA_BIN_UART;//设置连接摄像头类型
 	camera_buffer_addr = ov7725_uart_image_bin[0];
 
-	gpio_init(OV7725_UART_VSYNC_PIN, GPI, GPIO_LOW, GPI_FLOATING_IN);
+	gpio_init(OV7725_UART_VSYNC_PIN, GPI, GPIO_LOW, GPI_PULL_UP);
 	while(!temp)
 	{
 		temp = gpio_get(OV7725_UART_VSYNC_PIN);

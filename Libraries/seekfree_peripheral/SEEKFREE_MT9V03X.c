@@ -263,9 +263,9 @@ uint16 set_mt9v03x_reg(UARTN_enum uartn, uint8 addr, uint16 data)
 //-------------------------------------------------------------------------------------------------------------------
 void mt9v03x_exti_init(void)
 {
-	gpio_init(MT9V03X_VSYNC_PIN, GPI, GPIO_LOW, GPI_FLOATING_IN);
+	gpio_init(MT9V03X_VSYNC_PIN, GPI, GPIO_LOW, GPI_PULL_UP);
 	exti_interrupt_init(MT9V03X_VSYNC_PIN, EXTI_Trigger_Falling, 0x00);
-	nvic_init(MT9V03X_VSYNC_IRQN, 2, ENABLE);
+	nvic_init(MT9V03X_VSYNC_IRQN, 0, ENABLE);
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -292,7 +292,7 @@ void mt9v03x_dma_init(void)
 	uint8 num;
 	for(num=0; num<8; num++)
 	{
-		gpio_init((PIN_enum)(MT9V03X_DATA_PIN + num), GPI, GPIO_LOW, GPI_FLOATING_IN);
+		gpio_init((PIN_enum)(MT9V03X_DATA_PIN + num), GPI, GPIO_LOW, GPI_PULL_UP);
 	}
 
 	//DMA1总线初始化
@@ -300,7 +300,7 @@ void mt9v03x_dma_init(void)
 	//DMA摄像头初始化
 	camera_dma_init(MT9V03X_DMA_CH, (uint32)MT9V03X_DATA_ADD, (uint32)camera_buffer_addr, MT9V03X_H*MT9V03X_W);
 	//中断配置
-	nvic_init(MT9V03X_DMA_IRQN, 0, ENABLE);
+	nvic_init(MT9V03X_DMA_IRQN, 1, ENABLE);
 }
 
 //-------------------------------------------------------------------------------------------------------------------

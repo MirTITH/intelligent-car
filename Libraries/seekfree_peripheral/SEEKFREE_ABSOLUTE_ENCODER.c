@@ -221,7 +221,7 @@ int16 encoder_speed_spi(void)
 void encoder_init_spi(void)
 {
 	//CS引脚初始化
-	gpio_init(ABS_ENCODER_SPI_PCS_PIN, GPO, GPIO_HIGH, GPO_PUSH_PUL);
+	gpio_init(ABS_ENCODER_SPI_PCS_PIN, GPO, GPIO_HIGH, GPO_PUSH_PULL);
 	//初始化SPI，使用软件控制CS引脚
 	spi_init(ABS_ENCODER_SPI_NUM, ABS_ENCODER_SPI_SCK_PIN, ABS_ENCODER_SPI_MOSI_PIN, ABS_ENCODER_SPI_MISO_PIN, SPI_NSS_NULL, 0, SystemCoreClock/32);
 	encoder_self5_check();

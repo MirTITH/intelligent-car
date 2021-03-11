@@ -24,6 +24,8 @@
 #include "zf_tim.h"
 
 void tim_interrupt_init (TIM_enum tim, uint32 freq, uint8 priority);
+void tim_interrupt_init_us (TIM_enum tim, uint32 timer, uint8 priority);
+void tim_interrupt_init_ms (TIM_enum tim, uint32 timer, uint8 priority);
 void tim_interrupt_enabnle (TIM_enum tim);
 void tim_interrupt_disabnle (TIM_enum tim);
 

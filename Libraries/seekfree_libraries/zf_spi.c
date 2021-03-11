@@ -35,7 +35,7 @@ static void spi_pin_init (SPI_SCKPIN_enum sck_pin, SPI_MOSIPIN_enum mosi_pin, SP
 	afio_init((PIN_enum)(sck_pin &0xff), GPO, (GPIOAF_enum)((sck_pin &0xf00)>>8), GPO_AF_PUSH_PUL);			// 提取对应IO索引 AF功能编码
 	afio_init((PIN_enum)(mosi_pin &0xff), GPO, (GPIOAF_enum)((mosi_pin &0xf00)>>8), GPO_AF_PUSH_PUL);		// 提取对应IO索引 AF功能编码
 	if(SPI_MISO_NULL != miso_pin)
-		afio_init((PIN_enum)(miso_pin &0xff), GPI, (GPIOAF_enum)((miso_pin &0xf00)>>8), GPI_FLOATING_IN);	// 提取对应IO索引 AF功能编码
+		afio_init((PIN_enum)(miso_pin &0xff), GPI, (GPIOAF_enum)((miso_pin &0xf00)>>8), GPI_PULL_UP);		// 提取对应IO索引 AF功能编码
 	if(SPI_NSS_NULL != cs_pin)
 		afio_init((PIN_enum)(cs_pin &0xff), GPO, (GPIOAF_enum)((cs_pin &0xf00)>>8), GPO_AF_PUSH_PUL);		// 提取对应IO索引 AF功能编码
 }

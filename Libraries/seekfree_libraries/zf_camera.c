@@ -74,7 +74,7 @@ void camera_tim_etr_init (TIM_ETR_PIN_enum pin)
 		case 0x3000:	RCC_APB1PeriphClockCmd(RCC_APB1ENR_TIM3, ENABLE);break;
 	}
 
-	afio_init((PIN_enum)(pin &0xff), GPI, (GPIOAF_enum)((pin &0xf00)>>8), GPI_FLOATING_IN);		// 提取对应IO索引 AF功能编码
+	afio_init((PIN_enum)(pin &0xff), GPI, (GPIOAF_enum)((pin &0xf00)>>8), GPI_PULL_UP);			// 提取对应IO索引 AF功能编码
 
 	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
 	TIM_TimeBaseStructure.TIM_Prescaler = 0;

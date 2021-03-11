@@ -32,13 +32,14 @@
 #define SEEKFREE_SCL	D3															// 定义SCL引脚  可任意更改为其他IO
 #define SEEKFREE_SDA	D4															// 定义SDA引脚  可任意更改为其他IO
 
-#define SDA				gpio_get (SEEKFREE_SDA)
+//#define SDA				gpio_get (SEEKFREE_SDA)
+#define SDA				((gpio_group[(SEEKFREE_SDA&0xf0)>>4]->IDR & (((uint16_t)0x0001) << (SEEKFREE_SDA&0x0f)))?1:0)
 #define SDA0()			GPIO_PIN_RESET (SEEKFREE_SDA)								// IO口输出低电平
 #define SDA1()			GPIO_PIN_SET (SEEKFREE_SDA)									// IO口输出高电平
 #define SCL0()			GPIO_PIN_RESET (SEEKFREE_SCL)								// IO口输出低电平
 #define SCL1()			GPIO_PIN_SET (SEEKFREE_SCL)									// IO口输出高电平
-#define DIR_OUT()		gpio_dir(SEEKFREE_SDA, GPO, GPO_PUSH_PUL)					// 输出方向
-#define DIR_IN()		gpio_dir(SEEKFREE_SDA, GPI, GPI_FLOATING_IN)				// 输入方向
+#define DIR_OUT()		gpio_dir(SEEKFREE_SDA, GPO, GPO_PUSH_PULL)					// 输出方向
+#define DIR_IN()		gpio_dir(SEEKFREE_SDA, GPI, GPI_PULL_UP)					// 输入方向
 
 #define SEEKFREE_ACK	1															// 主应答
 #define SEEKFREE_NACK	0															// 从应答

@@ -285,8 +285,8 @@ static uint8 ov7725_simiic_read_reg(uint8 dev_add, uint8 reg, IIC_type type)
 //-------------------------------------------------------------------------------------------------------------------
 static void ov7725_simiic_init(void)
 {
-	gpio_init(OV7725_SCL_PIN, GPO, GPIO_HIGH, GPO_PUSH_PUL);
-	gpio_init(OV7725_SDA_PIN, GPO, GPIO_HIGH, GPO_PUSH_PUL);
+	gpio_init(OV7725_SCL_PIN, GPO, GPIO_HIGH, GPO_PUSH_PULL);
+	gpio_init(OV7725_SDA_PIN, GPO, GPIO_HIGH, GPO_PUSH_PULL);
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -383,7 +383,7 @@ uint8 ov7725_init(void)
 	camera_type = CAMERA_BIN;														// 设置连接摄像头类型
 	camera_buffer_addr = ov7725_image_bin[0];
 
-	gpio_init(OV7725_UART_VSYNC_PIN, GPI, GPIO_LOW, GPI_FLOATING_IN);
+	gpio_init(OV7725_UART_VSYNC_PIN, GPI, GPIO_LOW, GPI_PULL_UP);
 	while(!temp)
 	{
 		temp = gpio_get(OV7725_UART_VSYNC_PIN);

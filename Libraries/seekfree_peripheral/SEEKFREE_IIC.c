@@ -33,7 +33,7 @@ uint8 IIC_ad_sub;															// 器件子地址
 uint8 *IIC_buf;																// 发送|接收数据缓冲区
 uint8 IIC_num;																// 发送|接收数据个数
 
-static uint16 simiic_delay_time=100;										// ICM等传感器应设置为100
+static uint16 simiic_delay_time=5;										// ICM等传感器应设置为100
 
 //-------------------------------------------------------------------------------------------------------------------
 // @brief		模拟IIC延时 时间设置
@@ -282,6 +282,6 @@ void simiic_read_regs(uint8 dev_add, uint8 reg, uint8 *dat_add, uint8 num, IIC_t
 //-------------------------------------------------------------------------------------------------------------------
 void simiic_init(void)
 {
-	gpio_init(SEEKFREE_SCL, GPO, GPIO_HIGH, GPO_PUSH_PUL);
-	gpio_init(SEEKFREE_SDA, GPO, GPIO_HIGH, GPO_PUSH_PUL);
+	gpio_init(SEEKFREE_SCL, GPO, GPIO_HIGH, GPO_PUSH_PULL);
+	gpio_init(SEEKFREE_SDA, GPO, GPIO_HIGH, GPO_PUSH_PULL);
 }
