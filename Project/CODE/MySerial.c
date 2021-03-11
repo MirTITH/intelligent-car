@@ -1,6 +1,6 @@
 #include "headfile.h"
 #include "MySerial.h"
-
+#include <stdlib.h>
 
 char* getrxs()
 {
@@ -132,7 +132,6 @@ void GetfValueFromStr(double* num_set, char* str, char* subStr)
 			str_num[i] = str_pointer[i];
 		}
 		str_num[num_end] = '\0';
-
 		*num_set = atof(str_num);
 	}
 }

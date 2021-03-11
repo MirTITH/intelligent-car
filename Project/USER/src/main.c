@@ -136,11 +136,14 @@ void GetInfoFromRX()
 		return;
 	}
 
-	GetfValueFromStr(&exp_Speed1, str, "es1=");
-	GetfValueFromStr(&exp_Speed2, str, "es2=");
+	// GetfValueFromStr(&exp_Speed1, str, "es1=");
+	// GetfValueFromStr(&exp_Speed2, str, "es2=");
 
-	GetfValueFromStr(&exp_Speed1, str, "es=");
-	GetfValueFromStr(&exp_Speed2, str, "es=");
+	// GetfValueFromStr(&exp_Speed1, str, "es=");
+	// GetfValueFromStr(&exp_Speed2, str, "es=");
+
+	GetfValueFromStr(&car_speed, str, "s=");
+	GetfValueFromStr(&turnRatio, str, "r=");
 
 	//获取PID_SpeedControl的参数
 	GetfValueFromStr(&PID_SC_Kp, str, "sp=");
@@ -158,10 +161,6 @@ void GetInfoFromRX()
 
 	GetfValueFromStr(&AC_CarSpeed_P, str, "cp=");
 	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
-	GetfValueFromStr(&car_speed, str, "s=");
-	GetfValueFromStr(&turnRatio, str, "r=");
-
-
 	//printf("%s", str);
 
 }
