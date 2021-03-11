@@ -3,8 +3,8 @@
 
 void MotorVolt_init()
 {
-	gpio_init(DIR1, GPO, GPIO_LOW, GPO_PUSH_PUL);
-	gpio_init(DIR2, GPO, GPIO_LOW, GPO_PUSH_PUL);
+	gpio_init(DIR1, GPO, GPIO_LOW, GPO_PUSH_PULL);
+	gpio_init(DIR2, GPO, GPIO_LOW, GPO_PUSH_PULL);
 	pwm_init(TIM_2, TIM_2_CH4_B11, 15000, 0);
 	pwm_init(TIM_2, TIM_2_CH2_A12, 15000, 0);
 
