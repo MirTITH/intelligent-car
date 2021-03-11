@@ -1,6 +1,7 @@
 #ifndef _PID_AngleControl_h_
 #define _PID_AngleControl_h_
 
+
 extern bool PID_AngleControl_On;
 extern double angle_yz_err;
 extern double bal_acc_angle_yz;
@@ -33,7 +34,7 @@ void PID_AngleControl_init();
 void PID_AngleControl_Calc();
 //void PID_balAngle_Calc();
 void Update_Gyro_Acc();
-double angle_calc(angle_m, gyro_m);
+double angle_calc();
 
 
 #endif
