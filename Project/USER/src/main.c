@@ -75,7 +75,7 @@ void PrintData()
 		// printf("Hubu,a\n");
 		// printf("%.2lf", exp_Speed1);
 		// printf(",%.2lf", exp_Speed2);
-		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
+		printf(",%d,%d", delta_encoder1, delta_encoder2);
 		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
 		// printf(",%lf", 10 * exp_acc_angle_yz);

@@ -25,8 +25,8 @@ extern bool PID_SpeedControl_On;
 
 extern long long encoder1;//编码器1的值
 extern long long encoder2;//编码器2的值
-extern long long delta_encoder1;//编码器1的当前值与 1 / SpeedConut_Feq 时间前的值的差
-extern long long delta_encoder2;//编码器2的当前值与 1 / SpeedConut_Feq 时间前的值的差
+extern int32 delta_encoder1;//编码器1的当前值与 1 / SpeedConut_Feq 时间前的值的差
+extern int32 delta_encoder2;//编码器2的当前值与 1 / SpeedConut_Feq 时间前的值的差
 extern double exp_Speed1;//电机1的期望速度，要改变电机转速只需修改此值即可
 extern double exp_Speed2;//电机2的期望速度，要改变电机转速只需修改此值即可
 extern int Volt1;//电机1的电压，最大值为PWM_DUTY_MAX(50000)

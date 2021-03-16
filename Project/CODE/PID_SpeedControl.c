@@ -21,8 +21,8 @@ long long encoder2;
 long long encoder1_last = 0;
 long long encoder2_last = 0;
 
-long long delta_encoder1 = 0;
-long long delta_encoder2 = 0;
+int32 delta_encoder1 = 0;
+int32 delta_encoder2 = 0;
 
 double exp_Speed1 = 0;
 double exp_Speed2 = 0;

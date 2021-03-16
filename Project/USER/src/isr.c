@@ -141,7 +141,7 @@ void EXTI0_1_IRQHandler(void)
 	}
 	if(EXTI_GetITStatus(EXTI_Line1))												// ¼ì²â line1 ÊÇ·ñ´¥·¢
 	{
-		
+
 		if (gpio_get(Encoder1_LSB))
 		{
 			encoder1++;
