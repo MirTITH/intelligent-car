@@ -37,8 +37,8 @@ double E2 = 0;
 
 void tim_interrupt_SpeedCount()
 {
-	delta_encoder1 = (encoder1 - encoder1_last) * 100 / SpeedConut_Feq;
-	delta_encoder2 = (encoder2 - encoder2_last) * 100 / SpeedConut_Feq;
+	delta_encoder1 = (encoder1 - encoder1_last) * SpeedConut_Feq / 100;
+	delta_encoder2 = (encoder2 - encoder2_last) * SpeedConut_Feq / 100;
 	encoder1_last = encoder1;
 	encoder2_last = encoder2;
 
@@ -50,7 +50,7 @@ void tim_interrupt_SpeedCount()
 
 void PID_SpeedControl_init()
 {
-	tim_interrupt_init(TIM_1, SpeedConut_Feq, 1);//初始化定时器中断
+	tim_interrupt_init(TIM_1, SpeedConut_Feq, 0);//初始化定时器中断
 	tim_interrupt_init(TIM_3, PID_SpeedControl_Calc_Feq, 2); //初始化基于TIM_3的中断（用于PID）
 	gpio_init(Encoder1_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
 	gpio_init(Encoder2_LSB, GPI, GPIO_LOW, GPI_FLOATING_IN);//编码器正反转
@@ -66,25 +66,17 @@ void PID_Volt_Calc()
 		static double I_Value1 = 0;//电机1积分项的值
 		static double I_Value2 = 0;//电机2积分项的值
 
-		// static double last_exp_Speed1 = 0;
-		// static double last_exp_Speed2 = 0;
 		if (PID_SC_Ki == 0)
 		{
 			I_Value1 = 0;
 			I_Value2 = 0;
-		}else
+		}
+		else
 		{
 			I_Value1 += PID_SC_Ki * E1 / PID_SpeedControl_Calc_Feq;
 			I_Value2 += PID_SC_Ki * E2 / PID_SpeedControl_Calc_Feq;
 		}
 		
-/* 		
-		Volt1 = PID_SC_Kp * E1 + I_Value1 + PID_SC_Kd * (exp_Speed1 - last_exp_Speed1);
-		Volt2 = PID_SC_Kp * E2 + I_Value2 + PID_SC_Kd * (exp_Speed2 - last_exp_Speed2);
-
-		last_exp_Speed1 = exp_Speed1;
-		last_exp_Speed2 = exp_Speed2;
- */
 		Volt1 = PID_SC_Kp * E1 + I_Value1;
 		Volt2 = PID_SC_Kp * E2 + I_Value2;
 
@@ -98,28 +90,3 @@ void PID_Volt_Calc()
 	}
 }
 
-void exti_interrupt_encoder_2()
-{
-	if (gpio_get(Encoder2_LSB))
-	{
-		encoder2--;
-	}
-	else
-	{
-		encoder2++;
-	}
-	
-}
-
-void exti_interrupt_encoder_1()
-{
-	if (gpio_get(Encoder1_LSB))
-	{
-		encoder1++;
-	}
-	else
-	{
-		encoder1--;
-	}
-	
-}

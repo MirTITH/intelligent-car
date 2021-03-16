@@ -71,16 +71,16 @@ void PrintData()
 	// printf(",rx %lld,ry %lld,rz %lld", rx, ry, rz);
 	if (PID_SpeedControl_On)
 	{
-		printf("es1,es2,s1,s2,v1,v2\n");
+		printf("s1,s2\n");
 		// printf("Hubu,a\n");
-		printf("%.2lf", exp_Speed1);
-		printf(",%.2lf", exp_Speed2);
+		// printf("%.2lf", exp_Speed1);
+		// printf(",%.2lf", exp_Speed2);
 		printf(",%lld,%lld", delta_encoder1, delta_encoder2);
 		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
-		// printf(",%lf", 10 * bal_acc_angle_yz);
-		// printf(",%lf", (bal_acc_angle_yz - acc_angle_yz) * 10);
-		printf(",%d,%d", Volt1 / 100, Volt2 / 100);
+		// printf(",%lf", 10 * exp_acc_angle_yz);
+		// printf(",%lf", (exp_acc_angle_yz - acc_angle_yz) * 10);
+		// printf(",%d,%d", Volt1 / 100, Volt2 / 100);
 		// printf(",%.2lf", PID_AC_D_Value);
 		// printf(",p %lf,d %lf", PID_SC_Kp, PID_SC_Kd);
 		// printf(",dt %llu", dt);
@@ -89,7 +89,7 @@ void PrintData()
 		//printf("p,d,ap,ai,ad\n");
 		printf("p %lf,i %lf,d %lf", PID_SC_Kp, PID_SC_Ki, PID_SC_Kd);
 		printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
-		printf(",ab %lf", bal_acc_angle_yz);
+		printf(",ab %lf", exp_acc_angle_yz);
 		printf(",E %lf", angle_yz_err);
 		printf(",cp %lf,cd %lf", AC_CarSpeed_P, AC_CarSpeed_D);
 		// printf(",ar %lf, gr %e", acc_ratio, gyro_ratio);
@@ -165,7 +165,7 @@ void GetInfoFromRX()
 	GetfValueFromStr(&AngleControl_P, str, "ap=");
 	GetfValueFromStr(&AngleControl_I, str, "ai=");
 	GetfValueFromStr(&AngleControl_D, str, "ad=");
-	GetfValueFromStr(&bal_acc_angle_yz, str, "ab=");
+	GetfValueFromStr(&exp_acc_angle_yz, str, "ab=");
 
 	GetfValueFromStr(&acc_ratio, str, "ar=");
 	GetfValueFromStr(&gyro_ratio, str, "gr=");

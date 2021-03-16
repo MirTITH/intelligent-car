@@ -4,7 +4,7 @@
 
 extern bool PID_AngleControl_On;
 extern double angle_yz_err;
-extern double bal_acc_angle_yz;
+extern double exp_acc_angle_yz;//期望角度（欲使车向前倾（电池方向），值应减小）
 extern double angle; //数据融合后的角度
 extern const double PI;
 

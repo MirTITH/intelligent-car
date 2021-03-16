@@ -3,14 +3,14 @@
 #include "PID_AngleControl.h"
 
 #define PID_AngleControl_Calc_Feq 200
-#define MAX_bal_acc_angle_yz 1.00
-#define MIN_bal_acc_angle_yz 0.65
+#define MAX_exp_acc_angle_yz 1.00
+#define MIN_exp_acc_angle_yz 0.65
 
 const double PI = 3.1415926535897932384626433832795;
 
 bool PID_AngleControl_On = false;
 double acc_angle_yz = 0;//y,z轴方向加速度的角度
-double bal_acc_angle_yz = 0.903;//平衡时的角度
+double exp_acc_angle_yz = 0.903;
 double last_angle_yz_err;
 double angle_yz_err = 0;
 
@@ -37,7 +37,7 @@ double Motor_AngleControl_Speed = 0;
 
 double angle = 0;
 
-double acc_ratio = 1;      //加速度计比例    
+double acc_ratio = 0.005;      //加速度计比例    
 
 double gyro_ratio = 0.001;    //陀螺仪比例
 
@@ -65,10 +65,10 @@ void PID_AngleControl_Calc()
 		exp_Speed1 = Motor_AngleControl_Speed * (1 - turnRatio);
 		exp_Speed2 = Motor_AngleControl_Speed * (1 + turnRatio);
 
-		sE = Motor_AngleControl_Speed - car_speed;
-		bal_acc_angle_yz += sE * AC_CarSpeed_P / PID_AngleControl_Calc_Feq + (sE - last_sE) * AC_CarSpeed_D;
-		if (bal_acc_angle_yz > MAX_bal_acc_angle_yz) bal_acc_angle_yz = MAX_bal_acc_angle_yz;
-		if (bal_acc_angle_yz < MIN_bal_acc_angle_yz) bal_acc_angle_yz = MIN_bal_acc_angle_yz;
+		sE = car_speed - Motor_AngleControl_Speed;
+		exp_acc_angle_yz -= sE * AC_CarSpeed_P / PID_AngleControl_Calc_Feq + (sE - last_sE) * AC_CarSpeed_D;
+		if (exp_acc_angle_yz > MAX_exp_acc_angle_yz) exp_acc_angle_yz = MAX_exp_acc_angle_yz;
+		if (exp_acc_angle_yz < MIN_exp_acc_angle_yz) exp_acc_angle_yz = MIN_exp_acc_angle_yz;
 
 		last_sE = sE;
 	}
@@ -94,7 +94,7 @@ void Update_Gyro_Acc()
 		}
 		last_angle_yz_err = angle_yz_err;
 		angle = angle_calc(acc_angle_yz, (double)icm_gyro_x);
-		angle_yz_err = bal_acc_angle_yz - angle;
+		angle_yz_err = exp_acc_angle_yz - angle;
 }
 
 double angle_calc(double angle_m, double gyro_m)
@@ -144,7 +144,7 @@ double angle_calc(double angle_m, double gyro_m)
 
     //根据偏差与陀螺仪测量得到的角度值计算当前角度值    
 
-    last_angle += (error_angle + gyro_now)/PID_AngleControl_Calc_Feq;
+    last_angle += error_angle + gyro_now / PID_AngleControl_Calc_Feq;
 
 
     return last_angle;    

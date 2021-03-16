@@ -1,6 +1,7 @@
 #ifndef _PID_SpeedControl_h_
 #define _PID_SpeedControl_h_
 
+// 此处应与isr.c中的保持一致
 #define Encoder1_LSB A8
 #define Encoder2_LSB C1
 
@@ -18,9 +19,6 @@ void PID_SpeedControl_init();
 
 //电压计算，需要不断循环执行
 void PID_Volt_Calc();
-
-void exti_interrupt_encoder_2();
-void exti_interrupt_encoder_1();
 
 //是否启用电机转速PID控制
 extern bool PID_SpeedControl_On;

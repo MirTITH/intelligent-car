@@ -20,10 +20,19 @@
 #include "headfile.h"
 #include "isr.h"
 
+// 此处应与PID_SpeedControl中的保持一致
+#define Encoder1_LSB A8
+#define Encoder2_LSB C1
+
+extern long long encoder1;
+extern long long encoder2;
+
 extern void tim_interrupt_SpeedCount();
 extern void PID_Volt_Calc();
 extern void PID_AngleControl_Calc();
 extern unsigned long long TimeCountPeriod;
+
+
 
 
 void TIM1_BRK_UP_TRG_COM_IRQHandler (void)
@@ -118,14 +127,29 @@ void EXTI0_1_IRQHandler(void)
 	// 检测与清除中断标志可以根据实际应用进行删改
 	if(EXTI_GetITStatus(EXTI_Line0))												// 检测 line0 是否触发
 	{
-		extern void exti_interrupt_encoder_2();
-		exti_interrupt_encoder_2();
+
+		if (gpio_get(Encoder2_LSB))
+		{
+			encoder2--;
+		}
+		else
+		{
+			encoder2++;
+		}
+	
 		EXTI_ClearFlag(EXTI_Line0);													// 清除 line0 触发标志
 	}
 	if(EXTI_GetITStatus(EXTI_Line1))												// 检测 line1 是否触发
 	{
-		extern void exti_interrupt_encoder_1();
-		exti_interrupt_encoder_1();
+		
+		if (gpio_get(Encoder1_LSB))
+		{
+			encoder1++;
+		}
+		else
+		{
+			encoder1--;
+		}
 		EXTI_ClearFlag(EXTI_Line1);													// 清除 line1 触发标志
 	}
 //	EXTI_ClearFlag(0x0003);															// EXTI_Line0 | EXTI_Line1
