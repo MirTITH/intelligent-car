@@ -5,6 +5,7 @@
 extern bool PID_AngleControl_On;
 extern double angle_yz_err;
 extern double bal_acc_angle_yz;
+extern double angle; //数据融合后的角度
 extern const double PI;
 
 //角度姿态PID控制比例系数

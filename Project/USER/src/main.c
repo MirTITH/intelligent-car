@@ -23,7 +23,7 @@ void GetInfoFromRX();
 
 unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
-
+int duoji = 0;
 
 
 int main(void)
@@ -36,6 +36,11 @@ int main(void)
 	PID_AngleControl_init();
 	Timer_us_init();
 
+	gpio_init(A6, GPO, GPIO_LOW, GPO_PUSH_PULL);
+	pwm_init(TIM_17, TIM_17_CH1_A07, 50, 0);
+
+	
+
 	while(1)
 	{
 		dt = Timer_us_Get() - lastT;
@@ -43,7 +48,12 @@ int main(void)
 
 		PrintData();
 		systick_delay_ms(10);
-		
+
+		duoji = (1.5 - angle) * 5000 / PI + 1250;
+		if (duoji < 1250) duoji = 1250;
+		if (duoji > 6250) duoji = 6250;
+		pwm_duty_updata(TIM_17, TIM_17_CH1_A07, duoji);
+
 		GetInfoFromRX();
 	}
 }
@@ -162,6 +172,7 @@ void GetInfoFromRX()
 
 	GetfValueFromStr(&AC_CarSpeed_P, str, "cp=");
 	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
+
 	//printf("%s", str);
 
 }
