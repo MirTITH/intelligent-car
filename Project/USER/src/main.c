@@ -36,8 +36,8 @@ int main(void)
 	PID_AngleControl_init();
 	Timer_us_init();
 
-	gpio_init(A6, GPO, GPIO_LOW, GPO_PUSH_PULL);
-	pwm_init(TIM_17, TIM_17_CH1_A07, 50, 0);
+	gpio_init(A6, GPO, GPIO_LOW, GPO_PUSH_PULL); // ¶æ»ú
+	pwm_init(TIM_17, TIM_17_CH1_A07, 50, 0); // ¶æ»ú
 
 	
 

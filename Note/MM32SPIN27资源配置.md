@@ -22,6 +22,7 @@
 ## TIM16
 软件中断，PID角度控制
 ## TIM17
+舵机PWM
 
 # 中断优先级
 Project\CODE\PID_SpeedControl.c
