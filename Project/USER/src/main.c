@@ -19,18 +19,23 @@
 
 void PrintData();
 void GetInfoFromRX();
+void Camera_Calc();
 
 
 unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
+int board_right;
+int board_left;
+int midline;
 
 
 int main(void)
 {
 	board_init(true);																// 初始化 debug 输出串口
 	seekfree_wireless_init();
-	mt9v03x_init();
+	ips114_init();
 	icm20602_init_spi();
+	mt9v03x_init();
 	MotorVolt_init();
 	PID_SpeedControl_init();
 	PID_AngleControl_init();
@@ -40,7 +45,6 @@ int main(void)
 	gpio_init(A6, GPO, GPIO_LOW, GPO_PUSH_PULL); // 舵机
 	pwm_init(TIM_17, TIM_17_CH1_A07, 50, 0); // 舵机
 
-	
 
 	while(1)
 	{
@@ -54,9 +58,22 @@ int main(void)
 
 		if(mt9v03x_finish_flag)
 		{
-			seekfree_sendimg_03x(UART_1, mt9v03x_image[0], MT9V03X_W, MT9V03X_H);
+			Camera_Calc();
+
+			midline = board_left + board_right;
+			printf("m= %d,",midline);
+
+			ips114_displayimage032(mt9v03x_image[0], MT9V03X_W, MT9V03X_H);
+			//seekfree_sendimg_03x(UART_1, mt9v03x_image[0], MT9V03X_W, MT9V03X_H);
 			mt9v03x_finish_flag = 0;
 		}
+
+		turnRatio = -(double)(midline - 168) / 168;
+
+		if (turnRatio > 1) turnRatio = 1;
+		if (turnRatio < -1) turnRatio = -1;
+
+		printf("R= %llf\n", turnRatio);
 
 		GetInfoFromRX();
 	}
@@ -178,6 +195,71 @@ void GetInfoFromRX()
 	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
 
 	//printf("%s", str);
+
+}
+
+void Camera_Calc()
+{
+	bool found_left = false;
+	bool found_right = false;
+	for (int i = 94; i >= 5; i -= 5)
+	{
+		if ((mt9v03x_image[40][i] - mt9v03x_image[40][i - 5]) * 100 / (mt9v03x_image[40][i] + mt9v03x_image[40][i - 5]) > 15)
+		{
+			board_left = i;
+			found_left = true;
+			// printf("l=%d\t", board_left);
+			break;
+		}
+
+		// printf("%d ",(mt9v03x_image[40][i] - mt9v03x_image[40][i - 5]) * 100 / (mt9v03x_image[40][i] + mt9v03x_image[40][i - 5]));
+	}
+	// printf("|");
+	for (int i = 94; i <= 182; i += 5)
+	{
+		if ((mt9v03x_image[40][i] - mt9v03x_image[40][i + 5]) * 100 / (mt9v03x_image[40][i] + mt9v03x_image[40][i + 5]) > 15)
+		{
+			board_right = i;
+			found_right = true;
+			// printf("r=%d\t", board_right);
+			break;
+		}
+
+		// printf("%d ",(mt9v03x_image[40][i] - mt9v03x_image[40][i + 5]) * 100 / (mt9v03x_image[40][i] + mt9v03x_image[40][i + 5]));
+	}
+
+	// printf("fl=%d, fr=%d",found_left,found_right);
+
+	if ((found_left || found_right) == false)
+	{
+		// printf("miss");
+		for (int i = 94; i <= 182; i += 5)
+		{
+			if ((mt9v03x_image[40][i] - mt9v03x_image[40][i + 5]) * 100 / (mt9v03x_image[40][i] + mt9v03x_image[40][i + 5]) < -15)
+			{
+				board_left = i;
+				found_left = true;
+				// printf("l=%d\t", found_left);
+				break;
+			}
+		}
+
+		for (int i = 94; i >= 5; i -= 5)
+		{
+			if ((mt9v03x_image[40][i] - mt9v03x_image[40][i - 5]) * 100 / (mt9v03x_image[40][i] + mt9v03x_image[40][i - 5]) < -15)
+			{
+				board_right = i;
+				found_right = true;
+				// printf("r=%d\t", board_right);
+				break;
+			}
+		}
+
+		if ((found_right && found_left) == true)
+		{
+			printf("board Err\n");
+		}
+	}
 
 }
 
