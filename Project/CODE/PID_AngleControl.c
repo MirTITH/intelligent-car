@@ -4,7 +4,7 @@
 
 #define PID_AngleControl_Calc_Feq 200
 #define MAX_exp_acc_angle_yz 1.00
-#define MIN_exp_acc_angle_yz 0.65
+#define MIN_exp_acc_angle_yz 0.75
 
 const double PI = 3.1415926535897932384626433832795;
 
@@ -41,6 +41,8 @@ double acc_ratio = 0.005;      //加速度计比例
 
 double gyro_ratio = 0.001;    //陀螺仪比例
 
+int duoji = 0;
+
 void PID_AngleControl_init()
 {
 	systick_delay_ms(300);
@@ -53,6 +55,12 @@ void PID_AngleControl_Calc()
 	Update_Gyro_Acc();
 	static double last_sE = 0;
 	static double sE = 0;//当前车速与期望车速的差
+
+	duoji = (1.5 - angle) * 5000 / PI + 1250;
+	if (duoji < 1250) duoji = 1250;
+	if (duoji > 6250) duoji = 6250;
+	pwm_duty_updata(TIM_17, TIM_17_CH1_A07, duoji);
+
 	if (PID_AngleControl_On)
 	{
 		PID_AC_I_Value += AngleControl_I * angle_yz_err / PID_AngleControl_Calc_Feq;

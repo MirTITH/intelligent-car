@@ -23,17 +23,18 @@ void GetInfoFromRX();
 
 unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
-int duoji = 0;
 
 
 int main(void)
 {
 	board_init(true);																// 初始化 debug 输出串口
 	seekfree_wireless_init();
+	mt9v03x_init();
 	icm20602_init_spi();
 	MotorVolt_init();
 	PID_SpeedControl_init();
 	PID_AngleControl_init();
+	
 	Timer_us_init();
 
 	gpio_init(A6, GPO, GPIO_LOW, GPO_PUSH_PULL); // 舵机
@@ -43,16 +44,19 @@ int main(void)
 
 	while(1)
 	{
-		dt = Timer_us_Get() - lastT;
-		lastT = Timer_us_Get();
+		// dt = Timer_us_Get() - lastT;
+		// lastT = Timer_us_Get();
 
-		PrintData();
-		systick_delay_ms(10);
+		// PrintData();
+		// systick_delay_ms(10);
 
-		duoji = (1.5 - angle) * 5000 / PI + 1250;
-		if (duoji < 1250) duoji = 1250;
-		if (duoji > 6250) duoji = 6250;
-		pwm_duty_updata(TIM_17, TIM_17_CH1_A07, duoji);
+		
+
+		if(mt9v03x_finish_flag)
+		{
+			seekfree_sendimg_03x(UART_1, mt9v03x_image[0], MT9V03X_W, MT9V03X_H);
+			mt9v03x_finish_flag = 0;
+		}
 
 		GetInfoFromRX();
 	}
