@@ -41,8 +41,12 @@ unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
 
 int midline_40;  // 其实是左边界+右边界，是中心值的2倍;
-int CamTurnRate = 168;
+int midline_35;  // 其实是左边界+右边界，是中心值的2倍;
+int midline_30;  // 其实是左边界+右边界，是中心值的2倍;
+int CamTurnRate = 200;
 CamResult cam_result_40;
+CamResult cam_result_35;
+CamResult cam_result_30;
 
 // int board_right;
 // int board_left;
@@ -82,6 +86,10 @@ int main(void)
 
 			cam_result_40 = Camera_Calc(40, MT9V03X_W / 2, 5, 12);
 			midline_40 = cam_result_40.board_left + cam_result_40.board_right;
+			// cam_result_35 = Camera_Calc(35, midline_40 / 2, 5, 12);
+			// midline_35 = cam_result_35.board_left + cam_result_35.board_right;
+			// cam_result_30 = Camera_Calc(30, midline_35 / 2, 5, 12);
+			// midline_30 = cam_result_30.board_left + cam_result_30.board_right;
 
 			if (cam_result_40.found_left && cam_result_40.found_right)
 			{
@@ -111,8 +119,8 @@ int main(void)
 			// printf("%lld\n", Timer_us_Get() - TBegin);
 		}
 
-		if (turnRatio > 0.8) turnRatio = 0.8;
-		if (turnRatio < -0.8) turnRatio = -0.8;
+		if (turnRatio > 0.7) turnRatio = 0.7;
+		if (turnRatio < -0.7) turnRatio = -0.7;
 
 		GetInfoFromRX();
 	}
@@ -155,7 +163,7 @@ void PrintData()
 		printf(",ab %lf", exp_acc_angle_yz);
 		printf(",E %lf", angle_yz_err);
 		printf(",cp %lf,cd %lf", AC_CarSpeed_P, AC_CarSpeed_D);
-		printg(",ct %d", CamTurnRate);
+		printf(",ct %d", CamTurnRate);
 		// printf(",ar %lf, gr %e", acc_ratio, gyro_ratio);
 
 
