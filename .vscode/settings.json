@@ -5,6 +5,7 @@
 		"timer_us.h": "c",
 		"headfile.h": "c",
 		"myserial.h": "c",
-		"motorvolt.h": "c"
+		"motorvolt.h": "c",
+		"pid_speedcontrol.h": "c"
 	}
 }
