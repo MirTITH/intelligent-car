@@ -43,7 +43,8 @@ unsigned long long dt = 0;//循环的间隔（微秒）
 int midline_40;  // 其实是左边界+右边界，是中心值的2倍;
 int midline_35;  // 其实是左边界+右边界，是中心值的2倍;
 int midline_30;  // 其实是左边界+右边界，是中心值的2倍;
-int CamTurnRate = 200;
+int CamTurnRate = 220;
+
 CamResult cam_result_40;
 CamResult cam_result_35;
 CamResult cam_result_30;

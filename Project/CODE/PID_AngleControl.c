@@ -23,7 +23,7 @@ double AngleControl_I = 1000;
 double AngleControl_D = 3;
 
 double AC_CarSpeed_P = 0.0013;
-double AC_CarSpeed_D = 0.001;
+double AC_CarSpeed_D = 0.0013;
 
 double PID_AC_I_Value = 0;//积分项的值
 double PID_AC_D_Value = 0;//微分项的值
@@ -56,9 +56,9 @@ void PID_AngleControl_Calc()
 	static double last_sE = 0;
 	static double sE = 0;//当前车速与期望车速的差
 
-	duoji = (1.5 - angle) * 5000 / PI + 1250;
-	if (duoji < 1250) duoji = 1250;
-	if (duoji > 6250) duoji = 6250;
+	duoji = (angle) * 5000 / PI + 1250;
+	if (duoji < 1500) duoji = 1500;
+	if (duoji > 5800) duoji = 5800;
 	pwm_duty_updata(TIM_17, TIM_17_CH1_A07, duoji);
 
 	if (PID_AngleControl_On)

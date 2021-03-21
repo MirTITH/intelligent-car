@@ -1,4 +1,6 @@
 Project/IAR/*
+Project/MDK/Objects/*.crf
+Project/MDK/Objects/*.axf
 
 # Prerequisites
 *.d
@@ -52,3 +54,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+
+
+
