@@ -43,7 +43,9 @@ unsigned long long dt = 0;//循环的间隔（微秒）
 int midline_40;  // 其实是左边界+右边界，是中心值的2倍;
 int midline_35;  // 其实是左边界+右边界，是中心值的2倍;
 int midline_30;  // 其实是左边界+右边界，是中心值的2倍;
-int CamTurnRate = 220;
+int CamTurnRate = 250;
+double exp_turnRatio = 0;
+
 
 CamResult cam_result_40;
 CamResult cam_result_35;
@@ -75,8 +77,8 @@ int main(void)
 
 	while(1)
 	{
-		// dt = Timer_us_Get() - lastT;
-		// lastT = Timer_us_Get();
+		dt = Timer_us_Get() - lastT;
+		lastT = Timer_us_Get();
 
 		PrintData();
 		// systick_delay_ms(10);
@@ -94,19 +96,19 @@ int main(void)
 
 			if (cam_result_40.found_left && cam_result_40.found_right)
 			{
-				turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
+				exp_turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
 			}
 			else if (cam_result_40.found_left && !cam_result_40.found_right)
 			{
-				turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
+				exp_turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
 			}
 			else if (!cam_result_40.found_left && cam_result_40.found_right)
 			{
-				turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
+				exp_turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
 			}
 			else if (!cam_result_40.found_left && !cam_result_40.found_right)
 			{
-				turnRatio = 0;
+				exp_turnRatio = 0;
 			}
 
 			if (screen_counter > 0)
@@ -119,6 +121,8 @@ int main(void)
 
 			// printf("%lld\n", Timer_us_Get() - TBegin);
 		}
+
+		turnRatio += (exp_turnRatio - turnRatio) * 0.5;
 
 		if (turnRatio > 0.7) turnRatio = 0.7;
 		if (turnRatio < -0.7) turnRatio = -0.7;

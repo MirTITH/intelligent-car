@@ -1,6 +1,8 @@
 Project/IAR/*
 Project/MDK/Objects/*.crf
 Project/MDK/Objects/*.axf
+Project/MDK/Objects/MM32SPIN2PS.build_log.htm
+Project/MDK/JLinkLog.txt
 
 # Prerequisites
 *.d
@@ -58,4 +60,5 @@ dkms.conf
 
 
 
-Project/MDK/Objects/MM32SPIN2PS.build_log.htm
+
+
