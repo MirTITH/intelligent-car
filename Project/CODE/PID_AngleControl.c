@@ -3,14 +3,14 @@
 #include "PID_AngleControl.h"
 
 #define PID_AngleControl_Calc_Feq 200
-#define MAX_exp_acc_angle_yz 1.00
-#define MIN_exp_acc_angle_yz 0.75
+#define MAX_exp_acc_angle_yz 1.15
+#define MIN_exp_acc_angle_yz 0.70
 
 const double PI = 3.1415926535897932384626433832795;
 
 bool PID_AngleControl_On = false;
 double acc_angle_yz = 0;//y,z轴方向加速度的角度
-double exp_acc_angle_yz = 0.903;
+double exp_acc_angle_yz = 1.01;
 double last_angle_yz_err;
 double angle_yz_err = 0;
 

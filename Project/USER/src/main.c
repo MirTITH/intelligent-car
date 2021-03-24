@@ -34,25 +34,31 @@ center 从哪里开始往两边搜索
 step 搜索的步长
 threshold 阈值
 */
-CamResult Camera_Calc(int row, int center, int step, int threshold);
+CamResult Camera_Calc_x(int row, int center, int step, int threshold);
 
+int Camera_Calc_y(int col_l, int col_r, int step_x, int step_y, int threshold,  int max_delta_y);
 
 unsigned long long lastT = 0;//上次循环的微秒值
 unsigned long long dt = 0;//循环的间隔（微秒）
 
-int midline_40;  // 其实是左边界+右边界，是中心值的2倍;
-int midline_35;  // 其实是左边界+右边界，是中心值的2倍;
-int midline_30;  // 其实是左边界+右边界，是中心值的2倍;
-int CamTurnRate = 250;
-double exp_turnRatio = 0;
+int midline_40 = MT9V03X_W;  // 其实是左边界+右边界，是中心值的2倍;
+// int midline_35;  // 其实是左边界+右边界，是中心值的2倍;
+// int midline_30;  // 其实是左边界+右边界，是中心值的2倍;
+int CamTurnRate = 270;
+// double exp_turnRatio = 0;
 
+int peak_y_pos = 0; //顶点的x坐标
+
+int branch_turnL = true;
 
 CamResult cam_result_40;
-CamResult cam_result_35;
-CamResult cam_result_30;
+// CamResult cam_result_35;
+// CamResult cam_result_30;
 
 // int board_right;
 // int board_left;
+
+double turnRatioAdd = 0;
 
 int main(void)
 {
@@ -86,33 +92,64 @@ int main(void)
 		if(mt9v03x_finish_flag)
 		{
 			// TBegin = Timer_us_Get();
-
-			cam_result_40 = Camera_Calc(40, MT9V03X_W / 2, 5, 12);
+			if (peak_y_pos == -1)
+			{
+				cam_result_40 = Camera_Calc_x(40, midline_40 / 2, 5, 12);
+				turnRatioAdd = 0;
+				// if (turnRatioAdd > 0.3) turnRatioAdd = 0.3;
+				// if (turnRatioAdd < -0.3) turnRatioAdd = -0.3;
+		
+			}
+			else
+			{
+				if (branch_turnL)
+				{
+					turnRatioAdd = 0.1;
+					cam_result_40 = Camera_Calc_x(40, (peak_y_pos + cam_result_40.board_left) / 2, 5, 12);
+				}
+				else
+				{
+					turnRatioAdd = 0.1;
+					cam_result_40 = Camera_Calc_x(40, (peak_y_pos + cam_result_40.board_right) / 2, 5, 12);
+				}
+			}
+			
 			midline_40 = cam_result_40.board_left + cam_result_40.board_right;
-			// cam_result_35 = Camera_Calc(35, midline_40 / 2, 5, 12);
+			peak_y_pos = Camera_Calc_y(0, MT9V03X_W - 1, 5, 10, 20, 3);
+			// cam_result_35 = Camera_Calc_x(35, midline_40 / 2, 5, 12);
 			// midline_35 = cam_result_35.board_left + cam_result_35.board_right;
-			// cam_result_30 = Camera_Calc(30, midline_35 / 2, 5, 12);
+			// cam_result_30 = Camera_Calc_x(30, midline_35 / 2, 5, 12);
 			// midline_30 = cam_result_30.board_left + cam_result_30.board_right;
 
 			if (cam_result_40.found_left && cam_result_40.found_right)
 			{
-				exp_turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
+				turnRatio = -(double)(midline_40 - 168) / CamTurnRate + turnRatioAdd;
 			}
 			else if (cam_result_40.found_left && !cam_result_40.found_right)
 			{
-				exp_turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
+				turnRatio = -(double)(midline_40 - 168) / CamTurnRate + turnRatioAdd;
 			}
 			else if (!cam_result_40.found_left && cam_result_40.found_right)
 			{
-				exp_turnRatio = -(double)(midline_40 - 168) / CamTurnRate;
+				turnRatio = -(double)(midline_40 - 168) / CamTurnRate + turnRatioAdd;
 			}
 			else if (!cam_result_40.found_left && !cam_result_40.found_right)
 			{
-				exp_turnRatio = 0;
+				turnRatio = 0 +  + turnRatioAdd;
 			}
 
 			if (screen_counter > 0)
 			{
+				// if (peak_y_pos > 0)
+				// {
+				// 	for (int i = 0; i < MT9V03X_H; i += 2)
+				// 	{
+				// 		mt9v03x_image[i][peak_y_pos] = 0;
+				// 		// mt9v03x_image[i][peak_y_pos - 1] = 0;
+				// 		mt9v03x_image[i][midline_40 / 2] = 0;
+						
+				// 	}
+				// }
 				ips114_displayimage032(mt9v03x_image[0], MT9V03X_W, MT9V03X_H);
 				screen_counter--;
 			}
@@ -122,10 +159,10 @@ int main(void)
 			// printf("%lld\n", Timer_us_Get() - TBegin);
 		}
 
-		turnRatio += (exp_turnRatio - turnRatio) * 0.5;
+		// turnRatio += (exp_turnRatio - turnRatio) * 0.5;
 
-		if (turnRatio > 0.7) turnRatio = 0.7;
-		if (turnRatio < -0.7) turnRatio = -0.7;
+		if (turnRatio > 0.6) turnRatio = 0.6;
+		if (turnRatio < -0.6) turnRatio = -0.6;
 
 		GetInfoFromRX();
 	}
@@ -149,9 +186,10 @@ void PrintData()
 		// printf("%.2lf", exp_Speed1);
 		// printf(",%.2lf", exp_Speed2);
 		// printf(",%d,%d", delta_encoder1, delta_encoder2);
-		printf("m %d,",midline_40);
-		printf("R %llf", turnRatio);
-		printf(",%d%d", cam_result_40.found_left, cam_result_40.found_right);
+		// printf("m %d,",midline_40);
+		// printf("R %llf", turnRatio);
+		printf("py %d\t", peak_y_pos);
+		printf("bl %d\tbr %d", cam_result_40.board_left, cam_result_40.board_right);
 		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
 		// printf(",%lf", 10 * exp_acc_angle_yz);
@@ -166,7 +204,7 @@ void PrintData()
 		printf("p %lf,i %lf,d %lf", PID_SC_Kp, PID_SC_Ki, PID_SC_Kd);
 		printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
 		printf(",ab %lf", exp_acc_angle_yz);
-		printf(",E %lf", angle_yz_err);
+		printf(",ang %lf", angle);
 		printf(",cp %lf,cd %lf", AC_CarSpeed_P, AC_CarSpeed_D);
 		printf(",ct %d", CamTurnRate);
 		// printf(",ar %lf, gr %e", acc_ratio, gyro_ratio);
@@ -251,12 +289,13 @@ void GetInfoFromRX()
 	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
 
 	GetiValueFromStr(&CamTurnRate, str, "ct=");
+	GetiValueFromStr(&branch_turnL, str, "tl=");
 
 	//printf("%s", str);
 
 }
 
-CamResult Camera_Calc(int row, int center, int step, int threshold)
+CamResult Camera_Calc_x(int row, int center, int step, int threshold)
 {
 	CamResult result;
 	result.board_left = -1;
@@ -321,6 +360,40 @@ CamResult Camera_Calc(int row, int center, int step, int threshold)
 	// printf("l=%3d,r=%3d,il=%d,ir=%d\n",result.board_left,result.board_right,result.found_left,result.found_right);
 	return result;
 
+}
+
+int Camera_Calc_y(int col_l, int col_r, int step_x, int step_y, int threshold, int max_delta_y)
+{
+	int last_y = -1;
+	int peak_x; //顶点的x坐标
+	int peak_y = -1;//顶点的y坐标
+
+	for (int x = col_l; x <= col_r; x += step_x)
+	{
+		for (int y = MT9V03X_H - 1; y - step_y>= 0; y -= step_y)
+		{
+			if((mt9v03x_image[y][x] - mt9v03x_image[y - step_y][x]) * 100 / (mt9v03x_image[y][x] +mt9v03x_image[y - step_y][x]) > threshold)
+			{
+				if (y > last_y)
+				{
+					last_y = y;
+					peak_x = x;
+					peak_y = y;
+				}
+				else
+				{
+					if (peak_y - y > max_delta_y)
+					{
+
+						return peak_x;
+					}
+				}
+				
+			}
+		}
+	}
+
+	return -1;
 }
 
 // **************************** 代码区域 ****************************
