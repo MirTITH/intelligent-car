@@ -35,6 +35,7 @@ step 搜索的步长
 threshold 阈值
 */
 CamResult Camera_Calc_x(int row, int center, int step, int threshold);
+int Camera_Find_branch(int row, int col_l, int col_r, int step, int threshold);
 
 int Camera_Calc_y(int col_l, int col_r, int step_x, int step_y, int threshold,  int max_delta_y);
 
@@ -53,6 +54,8 @@ int peak_y_pos = -1; //顶点的x坐标
 // int branch_turnL = true;
 
 int turnL_Status = 0; //向左转的状态，为0时走中线，小于0时向右走，大于0时向左走
+
+int find_branch = 0;
 
 CamResult cam_result_40;
 // CamResult cam_result_35;
@@ -87,7 +90,7 @@ int main(void)
 		dt = Timer_us_Get() - lastT;
 		lastT = Timer_us_Get();
 
-		PrintData();
+		// PrintData();
 		// systick_delay_ms(10);
 
 		if(mt9v03x_finish_flag)
@@ -113,7 +116,19 @@ int main(void)
 			cam_result_40 = Camera_Calc_x(40, cam_result_40.board_left + (cam_result_40.board_right - cam_result_40.board_left) * (120 - turnL_Status) / 240, 5, 12);
 
 			midline_40 = cam_result_40.board_left + cam_result_40.board_right;
-			peak_y_pos = Camera_Calc_y(cam_result_40.board_left, cam_result_40.board_right, 5, 5, 20, 5);
+
+			find_branch = Camera_Find_branch(8, cam_result_40.board_left, cam_result_40.board_right, 5, 18);
+
+			if (find_branch)
+			{
+				printf("Found\n");
+			}
+			else
+			{
+				printf("NOT Found\n");
+			}
+			
+			// peak_y_pos = Camera_Calc_y(cam_result_40.board_left, cam_result_40.board_right, 5, 3, 20, 6);
 
 			// cam_result_35 = Camera_Calc_x(35, midline_40 / 2, 5, 12);
 			// midline_35 = cam_result_35.board_left + cam_result_35.board_right;
@@ -155,6 +170,7 @@ int main(void)
 			//seekfree_sendimg_03x(UART_1, mt9v03x_image[0], MT9V03X_W, MT9V03X_H);
 			mt9v03x_finish_flag = 0;
 
+			// if (peak_y_pos != -1) printf("py %d\n", peak_y_pos);
 			// printf("%lld\n", Timer_us_Get() - TBegin);
 		}
 
@@ -187,7 +203,6 @@ void PrintData()
 		// printf(",%d,%d", delta_encoder1, delta_encoder2);
 		// printf("m %d,",midline_40);
 		// printf("R %llf", turnRatio);
-		if (peak_y_pos != -1) printf("py %d\t", peak_y_pos);
 		// printf("bl %d\tbr %d", cam_result_40.board_left, cam_result_40.board_right);
 		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
@@ -299,12 +314,12 @@ void GetInfoFromRX()
 CamResult Camera_Calc_x(int row, int center, int step, int threshold)
 {
 	CamResult result;
-	result.board_left = -1;
-	result.board_right = MT9V03X_W;
+	result.board_left = 0;
+	result.board_right = MT9V03X_W - 1;
 	result.found_left = false;
 	result.found_right = false;
 
-	for (int i = MT9V03X_W / 2; i >= step; i -= step)
+	for (int i = center; i >= step; i -= step)
 	{
 		if ((mt9v03x_image[row][i] - mt9v03x_image[row][i - step]) * 100 / (mt9v03x_image[row][i] + mt9v03x_image[row][i - step]) > threshold)
 		{
@@ -315,7 +330,7 @@ CamResult Camera_Calc_x(int row, int center, int step, int threshold)
 		}
 	}
 	// printf("|");
-	for (int i = MT9V03X_W / 2; i <= MT9V03X_W - 1 - step; i += step)
+	for (int i = center; i <= MT9V03X_W - 1 - step; i += step)
 	{
 		if ((mt9v03x_image[row][i] - mt9v03x_image[row][i + step]) * 100 / (mt9v03x_image[row][i] + mt9v03x_image[row][i + step]) > threshold)
 		{
@@ -329,7 +344,7 @@ CamResult Camera_Calc_x(int row, int center, int step, int threshold)
 	if ((result.found_left || result.found_right) == false)
 	{
 		// printf("miss");
-		for (int i = MT9V03X_W / 2; i <= MT9V03X_W - 1 - step; i += step)
+		for (int i = center; i <= MT9V03X_W - 1 - step; i += step)
 		{
 			if ((mt9v03x_image[row][i] - mt9v03x_image[row][i + step]) * 100 / (mt9v03x_image[row][i] + mt9v03x_image[row][i + step]) < -threshold)
 			{
@@ -340,7 +355,7 @@ CamResult Camera_Calc_x(int row, int center, int step, int threshold)
 			}
 		}
 
-		for (int i = MT9V03X_W / 2; i >= step; i -= step)
+		for (int i = center; i >= step; i -= step)
 		{
 			if ((mt9v03x_image[row][i] - mt9v03x_image[row][i - step]) * 100 / (mt9v03x_image[row][i] + mt9v03x_image[row][i - step]) < -threshold)
 			{
@@ -395,6 +410,42 @@ int Camera_Calc_y(int col_l, int col_r, int step_x, int step_y, int threshold, i
 	}
 
 	return -1;
+}
+
+int Camera_Find_branch(int row, int col_l, int col_r, int step, int threshold)
+{
+	int left = 0;
+	int right = 0;
+	for (int i = col_l; i <= col_r; i += step)
+	{
+		if (i + step > MT9V03X_W - 1) break;
+
+		if ((mt9v03x_image[row][i] - mt9v03x_image[row][i + step]) * 100 / (mt9v03x_image[row][i] + mt9v03x_image[row][i + step]) > threshold)
+		{
+			left = i;
+			break;
+		}
+	}
+	// printf("|");
+	for (int i = col_r; i >= col_l; i -= step)
+	{
+		if (i - step < 0) break;
+
+		if ((mt9v03x_image[row][i] - mt9v03x_image[row][i - step]) * 100 / (mt9v03x_image[row][i] + mt9v03x_image[row][i - step]) > threshold)
+		{
+			right = i;
+			break;
+		}
+	}
+
+	if (right - left > 0)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 // **************************** 代码区域 ****************************
