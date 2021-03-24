@@ -44,12 +44,15 @@ unsigned long long dt = 0;//循环的间隔（微秒）
 int midline_40 = MT9V03X_W;  // 其实是左边界+右边界，是中心值的2倍;
 // int midline_35;  // 其实是左边界+右边界，是中心值的2倍;
 // int midline_30;  // 其实是左边界+右边界，是中心值的2倍;
+
 int CamTurnRate = 270;
 // double exp_turnRatio = 0;
 
-int peak_y_pos = 0; //顶点的x坐标
+int peak_y_pos = -1; //顶点的x坐标
 
-int branch_turnL = true;
+// int branch_turnL = true;
+
+int turnL_Status = 0; //向左转的状态，为0时走中线，小于0时向右走，大于0时向左走
 
 CamResult cam_result_40;
 // CamResult cam_result_35;
@@ -57,8 +60,6 @@ CamResult cam_result_40;
 
 // int board_right;
 // int board_left;
-
-double turnRatioAdd = 0;
 
 int main(void)
 {
@@ -92,30 +93,28 @@ int main(void)
 		if(mt9v03x_finish_flag)
 		{
 			// TBegin = Timer_us_Get();
-			if (peak_y_pos == -1)
-			{
-				cam_result_40 = Camera_Calc_x(40, midline_40 / 2, 5, 12);
-				turnRatioAdd = 0;
-				// if (turnRatioAdd > 0.3) turnRatioAdd = 0.3;
-				// if (turnRatioAdd < -0.3) turnRatioAdd = -0.3;
-		
-			}
-			else
-			{
-				if (branch_turnL)
-				{
-					turnRatioAdd = 0.1;
-					cam_result_40 = Camera_Calc_x(40, (peak_y_pos + cam_result_40.board_left) / 2, 5, 12);
-				}
-				else
-				{
-					turnRatioAdd = 0.1;
-					cam_result_40 = Camera_Calc_x(40, (peak_y_pos + cam_result_40.board_right) / 2, 5, 12);
-				}
-			}
+
+			// if (peak_y_pos == -1)
+			// {
+			// 	cam_result_40 = Camera_Calc_x(40, midline_40 / 2, 5, 12);
+			// }
+			// else
+			// {
+			// 	if (branch_turnL)
+			// 	{
+			// 		cam_result_40 = Camera_Calc_x(40, (peak_y_pos + cam_result_40.board_left) / 2, 5, 12);
+			// 	}
+			// 	else
+			// 	{
+			// 		cam_result_40 = Camera_Calc_x(40, (peak_y_pos + cam_result_40.board_right) / 2, 5, 12);
+			// 	}
+			// }
 			
+			cam_result_40 = Camera_Calc_x(40, cam_result_40.board_left + (cam_result_40.board_right - cam_result_40.board_left) * (120 - turnL_Status) / 240, 5, 12);
+
 			midline_40 = cam_result_40.board_left + cam_result_40.board_right;
-			peak_y_pos = Camera_Calc_y(0, MT9V03X_W - 1, 5, 10, 20, 3);
+			peak_y_pos = Camera_Calc_y(cam_result_40.board_left, cam_result_40.board_right, 5, 5, 20, 5);
+
 			// cam_result_35 = Camera_Calc_x(35, midline_40 / 2, 5, 12);
 			// midline_35 = cam_result_35.board_left + cam_result_35.board_right;
 			// cam_result_30 = Camera_Calc_x(30, midline_35 / 2, 5, 12);
@@ -123,19 +122,19 @@ int main(void)
 
 			if (cam_result_40.found_left && cam_result_40.found_right)
 			{
-				turnRatio = -(double)(midline_40 - 168) / CamTurnRate + turnRatioAdd;
+				turnRatio = -(double)(midline_40 - 168 - turnL_Status) / CamTurnRate;
 			}
 			else if (cam_result_40.found_left && !cam_result_40.found_right)
 			{
-				turnRatio = -(double)(midline_40 - 168) / CamTurnRate + turnRatioAdd;
+				turnRatio = -(double)(midline_40 - 168 - turnL_Status) / CamTurnRate;
 			}
 			else if (!cam_result_40.found_left && cam_result_40.found_right)
 			{
-				turnRatio = -(double)(midline_40 - 168) / CamTurnRate + turnRatioAdd;
+				turnRatio = -(double)(midline_40 - 168 - turnL_Status) / CamTurnRate;
 			}
 			else if (!cam_result_40.found_left && !cam_result_40.found_right)
 			{
-				turnRatio = 0 +  + turnRatioAdd;
+				turnRatio = (double)turnL_Status / CamTurnRate;
 			}
 
 			if (screen_counter > 0)
@@ -188,8 +187,8 @@ void PrintData()
 		// printf(",%d,%d", delta_encoder1, delta_encoder2);
 		// printf("m %d,",midline_40);
 		// printf("R %llf", turnRatio);
-		printf("py %d\t", peak_y_pos);
-		printf("bl %d\tbr %d", cam_result_40.board_left, cam_result_40.board_right);
+		if (peak_y_pos != -1) printf("py %d\t", peak_y_pos);
+		// printf("bl %d\tbr %d", cam_result_40.board_left, cam_result_40.board_right);
 		// printf(",%lf", car_speed);
 		// printf(",%lf", angle_yz_err * 10);
 		// printf(",%lf", 10 * exp_acc_angle_yz);
@@ -201,12 +200,13 @@ void PrintData()
 	}else
 	{
 		//printf("p,d,ap,ai,ad\n");
-		printf("p %lf,i %lf,d %lf", PID_SC_Kp, PID_SC_Ki, PID_SC_Kd);
-		printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
-		printf(",ab %lf", exp_acc_angle_yz);
-		printf(",ang %lf", angle);
-		printf(",cp %lf,cd %lf", AC_CarSpeed_P, AC_CarSpeed_D);
-		printf(",ct %d", CamTurnRate);
+		// printf("p %lf,i %lf,d %lf", PID_SC_Kp, PID_SC_Ki, PID_SC_Kd);
+		// printf(",ap %lf,ai %lf,ad %lf", AngleControl_P, AngleControl_I, AngleControl_D);
+		// printf(",ab %lf", exp_acc_angle_yz);
+		// printf(",ang %lf", angle);
+		// printf(",cp %lf,cd %lf", AC_CarSpeed_P, AC_CarSpeed_D);
+		// printf(",ct %d", CamTurnRate);
+		// printf(",tl %d", turnL_Status);
 		// printf(",ar %lf, gr %e", acc_ratio, gyro_ratio);
 
 
@@ -289,7 +289,8 @@ void GetInfoFromRX()
 	GetfValueFromStr(&AC_CarSpeed_D, str, "cd=");
 
 	GetiValueFromStr(&CamTurnRate, str, "ct=");
-	GetiValueFromStr(&branch_turnL, str, "tl=");
+	GetiValueFromStr(&turnL_Status, str, "tl=");
+	// GetiValueFromStr(&branch_turnL, str, "tl=");
 
 	//printf("%s", str);
 
