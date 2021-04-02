@@ -22,8 +22,8 @@ double AngleControl_P = 300;
 double AngleControl_I = 1000;
 double AngleControl_D = 3;
 
-double AC_CarSpeed_P = 0.0013;
-double AC_CarSpeed_D = 0.0015;
+double AC_CarSpeed_P = 0.0010;
+double AC_CarSpeed_D = 0.0014;
 
 double PID_AC_I_Value = 0;//积分项的值
 double PID_AC_D_Value = 0;//微分项的值
