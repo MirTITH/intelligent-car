@@ -13,8 +13,6 @@
 ### 作者
 谢阳 (Xie Yang)
 
-- E-mail: 200320620@stu.hit.edu.cn
-
 - github: [MirTITH (github.com)](https://github.com/MirTITH)
 - gitee: [TITHChan (tithchan) - Gitee.com](https://gitee.com/tithchan)
 
